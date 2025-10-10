@@ -1,5 +1,6 @@
 ## Game Classes and items
 import random
+import os
 
 
 ## ITEMS
@@ -31,6 +32,7 @@ class Char(Items):
         self.atk_power = atk_power
         self.armor_class = armor_class
         self.mana = 0
+        self.actions = []
         # inventory
         self.inventory = {}
         self.item_key = ""
@@ -57,6 +59,7 @@ class Char(Items):
         total_roll = roll + hit_chance
 
         if roll == 20:
+            print("CRITICAL STRIKE!")
             return roll >= ac, True
 
         return total_roll >= ac, False
@@ -70,22 +73,13 @@ class Char(Items):
         total_heal = (random.randint(heal_amount[0], heal_amount[1])) + spell_pwr
         return total_heal
 
-
-class Warrior(Char):
-    def __init__(self, name):
-        super().__init__(name, health=50, atk_power=5, armor_class=16)
-        self.actions = ["strike", "bash", "drink potion"]
-        self.weapon_name = "rusty dagger"
-        self.weapon_damage = self.weapons.get(self.weapon_name)
-        self.atk_power += self.weapon_damage[2]
-
     def do_action(self, mob_name, mob_ac, atk_power):
-        num = 1
+        counter = 1
 
         print("Choose a action:")
         for skill in self.actions:
-            print(f"{num}) {skill}")
-            num += 1
+            print(f"{counter}) {skill}")
+            counter += 1
 
         action = int(input("-> "))
         if action == 1 or action == 2:
@@ -97,19 +91,34 @@ class Warrior(Char):
                 return False
 
         if action == 1:
-            self.strike(mob_name, is_crit)
+            self.action = self.actions[0]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
 
         if action == 2:
-            pass
+            self.action = self.actions[1]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
 
         if action == 3:
-            pass
+            self.action = self.actions[2]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
+
+
+class Warrior(Char):
+    def __init__(self, name):
+        super().__init__(name, health=50, atk_power=5, armor_class=16)
+        self.weapon_name = "rusty dagger"
+        self.weapon_damage = self.weapons.get(self.weapon_name)
+        self.atk_power += self.weapon_damage[2]
+        self.actions = ["strike", "bash", "drink potion"]
 
     def strike(self, mob_name, is_crit):
         if is_crit:
             damage = (self.attack_dmg(self.atk_power, self.weapon_damage)) * 2
             new_mob.health -= damage
-            print(f"Critical Hit! You strike the {mob_name} for {damage} damage!")
+            print(f"You strike the {mob_name} for {damage} damage!")
         else:
             damage = self.attack_dmg(self.atk_power, self.weapon_damage)
             print(f"You strike the {mob_name} for {damage} damage!")
@@ -119,14 +128,18 @@ class Warrior(Char):
 class Mob(Char):
     def __init__(self, name):
         super().__init__(name, health=25, atk_power=2, armor_class=10)
+        self.actions = ["claws", "kicks", "spits"]
 
 
 new_toon = Warrior("bob")
 new_mob = Mob("goblin")
 
 
-#### Testing Area ####
+#### TESTING AREA #######
+
 print(f"You encounter a {new_mob.name}!")
+##input("Press enter to continue...")
+print("")
 while new_toon.health > 0 and new_mob.health > 0:
     print("--------- Status ---------)")
     print(f"{new_toon.name} Health: {new_toon.health}")
@@ -168,3 +181,29 @@ while new_toon.health > 0 and new_mob.health > 0:
 # new_toon = Warrior("bob", 100, 3, 15)
 # print(new_toon.attack_dmg(3, (1, 5)))
 # print(new_toon.hit_check(10, new_toon.atk_power))
+#
+# def do_action(self, mob_name, mob_ac, atk_power):
+#     counter = 1
+#
+#     print("Choose a action:")
+#     for skill in self.actions:
+#         print(f"{counter}) {skill}")
+#         counter += 1
+#
+#     action = int(input("-> "))
+#     if action == 1 or action == 2:
+#         hit, is_crit = self.hit_check(mob_ac, atk_power)
+#
+#         if not hit:
+#             # return f"You miss the {mob_name}!"
+#             print(f"You miss the {mob_name}!")
+#             return False
+#
+#     if action == 1:
+#         self.strike(mob_name, is_crit)
+#
+#     if action == 2:
+#         pass
+#
+#     if action == 3:
+#         pass
