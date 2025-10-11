@@ -132,7 +132,6 @@ class Warrior(Char):
 
     def bash(self, mob_name, is_crit):
         if is_crit:
-            # damage = (self.attack_dmg(self.atk_power, self.weapon_damage)) * 2
             damage = (self.attack_dmg(1, self.bash_damage)) * 2
             new_mob.health -= damage
             new_mob.stun_duration = 2
@@ -157,41 +156,69 @@ class Mob(Char):
         super().__init__(name, health=25, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
 
+    def do_action(self, mob_name, mob_ac, atk_power):
+        """
+        Iterates through the actions list and prints them out player. Actions list
+        are function names in each class. getattr is used to call the function.
+        """
+        random_action = random.randint(1, 3)
+
+        if random_action == 1 or random_action == 2 or random_action == 3:
+            hit, is_crit = self.hit_check(mob_ac, atk_power)
+
+            if not hit:
+                print(f"The {self.name} misses you!")
+                return False
+
+        if random_action == 1:
+            self.action = self.actions[0]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
+
+        if random_action == 2:
+            self.action = self.actions[1]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
+
+        if random_action == 3:
+            self.action = self.actions[2]
+            self.action_method = getattr(self, self.action)
+            self.action_method(mob_name, is_crit)
+
     def claws(self, _, is_crit):
+        damage = (self.attack_dmg(self.atk_power, (1, 4))) * 2
+        attack_mesge = f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
         if is_crit:
-            damage = (self.attack_dmg(self.atk_power, (1, 4))) * 2
+            damage = damage * 2
             new_toon.health -= damage
-            print(f"The {self.name} claws you for {damage} damage!")
+            print(attack_mesge)
         else:
-            damage = self.attack_dmg(self.atk_power, (1, 4))
             new_toon.health -= damage
-            print(f"The {self.name} claws you for {damage} damage!")
+            print(attack_mesge)
 
     def kicks(self, _, is_crit):
+        damage = (self.attack_dmg(self.atk_power, (1, 6))) * 2
+        attack_mesge = f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
         if is_crit:
-            damage = (self.attack_dmg(self.atk_power, (1, 6))) * 2
+            damage = damage * 2
             new_toon.health -= damage
-            print(f"The {self.name} kicks you for {damage} damage!")
+            print(attack_mesge)
         else:
-            damage = self.attack_dmg(self.atk_power, (1, 6))
             new_toon.health -= damage
-            print(f"The {self.name} kicks you for {damage} damage!")
+            print(attack_mesge)
 
     def spits(self, _, is_crit):
+        damage = (self.attack_dmg(self.atk_power, (1, 1))) * 2
+        attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are are stunned!"
         if is_crit:
-            damage = (self.attack_dmg(self.atk_power, (1, 1))) * 2
+            damage = damage * 2
             new_toon.health -= damage
             new_toon.stun_duration = 1
-            print(
-                f"The {self.name} spits in your eyes {damage} damage and you are stuned!!"
-            )
+            print(attack_mesge)
         else:
-            damage = self.attack_dmg(self.atk_power, (1, 1))
             new_toon.health -= damage
             new_toon.stun_duration = 1
-            print(
-                f"The {self.name} spits in your eyes for {damage} damage and you are stuned!!"
-            )
+            print(attack_mesge)
 
 
 new_toon = Warrior("bob")
