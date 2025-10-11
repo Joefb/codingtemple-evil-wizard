@@ -14,6 +14,7 @@ class Items:
         }
 
         self.weapons = {
+            "fists": (1, 2, 0),
             "rusty dagger": (1, 4, 0),
             "bronze sword": (3, 10, 1),
             "Mace of the Ancient Gods": (5, 15, 8),
@@ -150,6 +151,7 @@ class Warrior(Char):
         pass
 
 
+## GOBILN MOB CLASS
 class Mob(Char):
     def __init__(self, name):
         super().__init__(name, health=25, atk_power=2, armor_class=10)
@@ -188,7 +190,7 @@ class Mob(Char):
             new_toon.health -= damage
             new_toon.stun_duration = 1
             print(
-                f"The goblin spits in your eyes for {damage} damage and you are stuned!!"
+                f"The {self.name} spits in your eyes for {damage} damage and you are stuned!!"
             )
 
 
