@@ -186,7 +186,7 @@ class Mob(Char):
             self.action_method(mob_name, is_crit)
 
     def claws(self, _, is_crit):
-        damage = (self.attack_dmg(self.atk_power, (1, 4))) * 2
+        damage = self.attack_dmg(self.atk_power, (1, 4))
         attack_mesge = f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
         if is_crit:
             damage = damage * 2
@@ -197,7 +197,7 @@ class Mob(Char):
             print(attack_mesge)
 
     def kicks(self, _, is_crit):
-        damage = (self.attack_dmg(self.atk_power, (1, 6))) * 2
+        damage = self.attack_dmg(self.atk_power, (1, 6))
         attack_mesge = f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
         if is_crit:
             damage = damage * 2
@@ -208,7 +208,7 @@ class Mob(Char):
             print(attack_mesge)
 
     def spits(self, _, is_crit):
-        damage = (self.attack_dmg(self.atk_power, (1, 1))) * 2
+        damage = self.attack_dmg(self.atk_power, (1, 1))
         attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are are stunned!"
         if is_crit:
             damage = damage * 2
@@ -232,10 +232,21 @@ print(f"You encounter a {new_mob.name}!")
 print("")
 
 while new_toon.health > 0 and new_mob.health > 0:
-    print("--------- Status ---------)")
+    print("--------- Toon Status ---------")
     print(f"{new_toon.name} Health: {new_toon.health}")
     print(f"{new_mob.name} Health: {new_mob.health}")
+    print(f"Attack Power: {new_toon.atk_power}")
+    print(f"Armor Class: {new_toon.armor_class}")
+    print(f"Weapon: {new_toon.weapon_name}")
+    print(f"weapon Damage: {new_toon.weapon_damage}")
     print("---------------------------")
+    print("")
+    print("--------- Mob Status ---------")
+    print(f"{new_mob.name} Health: {new_mob.health}")
+    print(f"Attack Power: {new_mob.atk_power}")
+    print(f"Armor Class: {new_mob.armor_class}")
+    print(f"Weapon: {new_mob.weapon_name}")
+    print(f"weapon Damage: {new_mob.weapon_damage}")
 
     ## Attack and check if mob or player is stuned or dead
     if new_mob.health <= 0:
