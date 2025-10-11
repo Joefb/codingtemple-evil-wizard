@@ -38,6 +38,7 @@ class Char(Items):
         self.item_key = ""
         self.weapon_name = "Fists"
         self.weapon_damage = (1, 2)
+        self.stun_duration = 0
 
     def attack_dmg(self, atk_power, wep_dmg=()):
         """
@@ -74,6 +75,10 @@ class Char(Items):
         return total_heal
 
     def do_action(self, mob_name, mob_ac, atk_power):
+        """
+        Iterates through the actions list and prints them out player. Actions list
+        are function names in each class. getattr is used to call the function.
+        """
         counter = 1
 
         print("Choose a action:")
@@ -82,11 +87,10 @@ class Char(Items):
             counter += 1
 
         action = int(input("-> "))
-        if action == 1 or action == 2:
+        if action == 1 or action == 2 or action == 3:
             hit, is_crit = self.hit_check(mob_ac, atk_power)
 
             if not hit:
-                # return f"You miss the {mob_name}!"
                 print(f"You miss the {mob_name}!")
                 return False
 
@@ -108,11 +112,12 @@ class Char(Items):
 
 class Warrior(Char):
     def __init__(self, name):
-        super().__init__(name, health=50, atk_power=5, armor_class=16)
+        super().__init__(name, health=50, atk_power=5, armor_class=12)
         self.weapon_name = "rusty dagger"
         self.weapon_damage = self.weapons.get(self.weapon_name)
         self.atk_power += self.weapon_damage[2]
         self.actions = ["strike", "bash", "drink potion"]
+        self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
 
     def strike(self, mob_name, is_crit):
         if is_crit:
@@ -124,11 +129,67 @@ class Warrior(Char):
             print(f"You strike the {mob_name} for {damage} damage!")
             new_mob.health -= damage
 
+    def bash(self, mob_name, is_crit):
+        if is_crit:
+            # damage = (self.attack_dmg(self.atk_power, self.weapon_damage)) * 2
+            damage = (self.attack_dmg(1, self.bash_damage)) * 2
+            new_mob.health -= damage
+            new_mob.stun_duration = 2
+            print(f"You bash the {mob_name} for {damage} damage!")
+            print(f"The {new_mob.name} is stunned!")
+        else:
+            damage = self.attack_dmg(1, self.bash_damage)
+            # damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+            # damage = self.attack_dmg(1, 2)
+            print(f"You bash the {mob_name} for {damage} damage!")
+            print(f"The {mob_name} is stunned!")
+            new_mob.stun_duration = 2
+            new_mob.health -= damage
+
+    def drink_potion(self, mob_name, is_crit):
+        pass
+
 
 class Mob(Char):
     def __init__(self, name):
         super().__init__(name, health=25, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
+
+    def claws(self, _, is_crit):
+        if is_crit:
+            damage = (self.attack_dmg(self.atk_power, (1, 4))) * 2
+            new_toon.health -= damage
+            print(f"The {self.name} claws you for {damage} damage!")
+        else:
+            damage = self.attack_dmg(self.atk_power, (1, 4))
+            new_toon.health -= damage
+            print(f"The {self.name} claws you for {damage} damage!")
+
+    def kicks(self, _, is_crit):
+        if is_crit:
+            damage = (self.attack_dmg(self.atk_power, (1, 6))) * 2
+            new_toon.health -= damage
+            print(f"The {self.name} kicks you for {damage} damage!")
+        else:
+            damage = self.attack_dmg(self.atk_power, (1, 6))
+            new_toon.health -= damage
+            print(f"The {self.name} kicks you for {damage} damage!")
+
+    def spits(self, _, is_crit):
+        if is_crit:
+            damage = (self.attack_dmg(self.atk_power, (1, 1))) * 2
+            new_toon.health -= damage
+            new_toon.stun_duration = 1
+            print(
+                f"The {self.name} spits in your eyes {damage} damage and you are stuned!!"
+            )
+        else:
+            damage = self.attack_dmg(self.atk_power, (1, 1))
+            new_toon.health -= damage
+            new_toon.stun_duration = 1
+            print(
+                f"The goblin spits in your eyes for {damage} damage and you are stuned!!"
+            )
 
 
 new_toon = Warrior("bob")
@@ -140,20 +201,30 @@ new_mob = Mob("goblin")
 print(f"You encounter a {new_mob.name}!")
 ##input("Press enter to continue...")
 print("")
+
 while new_toon.health > 0 and new_mob.health > 0:
     print("--------- Status ---------)")
     print(f"{new_toon.name} Health: {new_toon.health}")
     print(f"{new_mob.name} Health: {new_mob.health}")
     print("---------------------------")
 
-    print("What will you do?!")
-    new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-
+    ## Attack and check if mob or player is stuned or dead
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
+    elif new_toon.stun_duration > 0:
+        print("You are stunned and cannot act this turn!")
+        new_toon.stun_duration -= 1
+    else:
+        print("What will you do?!")
+        new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
 
     if new_toon.health <= 0:
         print("You have been defeated!")
+    elif new_mob.stun_duration > 0:
+        print(f"The {new_mob.name} is stunned and cannot act this turn!")
+        new_mob.stun_duration -= 1
+    else:
+        new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
 
 
 # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
