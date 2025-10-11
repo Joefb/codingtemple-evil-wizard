@@ -53,17 +53,14 @@ class Char(Items):
         """
         This method takes in the armor class of the target and the hit chance of the attacker.
         A random 20 + the hit chance is rolled, if the number is
-        above the targets ac the attack hits, if not it fails. Returns a bool.
+        above the targets ac the attack hits, if not it fails. Returns a bools.
         If the roll is a natural 20, it is a critical hit and the second return
 
         """
-        roll = random.randint(1, 20)
+        roll = random.randint(20, 20)
         total_roll = roll + hit_chance
-
         if roll == 20:
-            print("CRITICAL STRIKE!")
             return roll >= ac, True
-
         return total_roll >= ac, False
 
     def heal_self(self, heal_amount=(), spell_pwr=0):
@@ -121,30 +118,30 @@ class Warrior(Char):
         self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
 
     def strike(self, mob_name, is_crit):
+        damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+        attack_mesge = f"You strike the {mob_name} for {damage} damage!"
         if is_crit:
-            damage = (self.attack_dmg(self.atk_power, self.weapon_damage)) * 2
+            damage = damage * 2
             new_mob.health -= damage
-            print(f"You strike the {mob_name} for {damage} damage!")
+            print("You land a CRITICAL STRIKE!")
+            print(attack_mesge)
         else:
-            damage = self.attack_dmg(self.atk_power, self.weapon_damage)
-            print(f"You strike the {mob_name} for {damage} damage!")
+            print(attack_mesge)
             new_mob.health -= damage
 
     def bash(self, mob_name, is_crit):
+        damage = self.attack_dmg(1, self.bash_damage)
+        attack_mesge = f"You bash the {mob_name} for {{damage}} damage!\nThe {mob_name} is stunned!"
         if is_crit:
-            damage = (self.attack_dmg(1, self.bash_damage)) * 2
+            damage = damage * 2
             new_mob.health -= damage
             new_mob.stun_duration = 2
-            print(f"You bash the {mob_name} for {damage} damage!")
-            print(f"The {new_mob.name} is stunned!")
+            print("You land a CRITICAL STRIKE!")
+            print(attack_mesge)
         else:
-            damage = self.attack_dmg(1, self.bash_damage)
-            # damage = self.attack_dmg(self.atk_power, self.weapon_damage)
-            # damage = self.attack_dmg(1, 2)
-            print(f"You bash the {mob_name} for {damage} damage!")
-            print(f"The {mob_name} is stunned!")
             new_mob.stun_duration = 2
             new_mob.health -= damage
+            print(attack_mesge)
 
     def drink_potion(self, mob_name, is_crit):
         pass
@@ -189,6 +186,7 @@ class Mob(Char):
         damage = self.attack_dmg(self.atk_power, (1, 4))
         attack_mesge = f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
         if is_crit:
+            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
             print(attack_mesge)
@@ -200,6 +198,7 @@ class Mob(Char):
         damage = self.attack_dmg(self.atk_power, (1, 6))
         attack_mesge = f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
         if is_crit:
+            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
             print(attack_mesge)
@@ -211,6 +210,7 @@ class Mob(Char):
         damage = self.attack_dmg(self.atk_power, (1, 1))
         attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are are stunned!"
         if is_crit:
+            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
             new_toon.stun_duration = 1
