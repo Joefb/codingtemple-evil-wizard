@@ -74,16 +74,28 @@ class Char(Items):
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
+        Checks if player is stunned, if so they cannot act.
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
         """
+        # Check if player is stunned
+        # if stuned decrament stun duration and skip turn
+        if self.stun_duration > 0:
+            self.stun_duration -= 1
+            print("You are stunned and cannot act this turn!")
+            return
+
+        # used for numbering the actions
         counter = 1
 
+        # list out actions
+        print("What will you do?")
         print("Choose a action:")
         for skill in self.actions:
             print(f"{counter}) {skill}")
             counter += 1
 
+        # gets player action and does a hit check
         action = int(input("-> "))
         if action == 1 or action == 2 or action == 3:
             hit, is_crit = self.hit_check(mob_ac, atk_power)
@@ -92,6 +104,7 @@ class Char(Items):
                 print(f"You miss the {mob_name}!")
                 return False
 
+        # gets the action from action list in the child class and calls the method
         if action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
@@ -111,15 +124,27 @@ class Char(Items):
 class Warrior(Char):
     def __init__(self, name):
         super().__init__(name, health=50, atk_power=5, armor_class=12)
+
+        # set starting weapon and get its damage from weapons dict in Items class
         self.weapon_name = "rusty dagger"
         self.weapon_damage = self.weapons.get(self.weapon_name)
+
+        # set the atk_power to include the weapon's atk_power bonus
         self.atk_power += self.weapon_damage[2]
+
+        # warrior actions. Each action is a method in this class
         self.actions = ["strike", "bash", "drink potion"]
+
+        # set bash damage and cooldown
         self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
+        self.bash_cooldown = 0
 
     def strike(self, mob_name, is_crit):
+        # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
         attack_mesge = f"You strike the {mob_name} for {damage} damage!"
+
+        # check for crit and apply damage
         if is_crit:
             damage = damage * 2
             new_mob.health -= damage
@@ -131,16 +156,26 @@ class Warrior(Char):
 
     def bash(self, mob_name, is_crit):
         damage = self.attack_dmg(1, self.bash_damage)
-        attack_mesge = f"You bash the {mob_name} for {{damage}} damage!\nThe {mob_name} is stunned!"
-        if is_crit:
+        attack_mesge = (
+            f"You bash the {mob_name} for {damage} damage!\nThe {mob_name} is stunned!"
+        )
+        # check if is on bash cooldown
+        if self.bash_cooldown > 0:
+            print(f"Bash is on cooldown for {self.bash_cooldown} more turns!")
+            self.bash_cooldown -= 1
+            return
+        # check for crit and apply damage and stun
+        elif is_crit:
             damage = damage * 2
             new_mob.health -= damage
             new_mob.stun_duration = 2
+            self.bash_cooldown = 2
             print("You land a CRITICAL STRIKE!")
             print(attack_mesge)
         else:
             new_mob.stun_duration = 2
             new_mob.health -= damage
+            self.bash_cooldown = 2
             print(attack_mesge)
 
     def drink_potion(self, mob_name, is_crit):
@@ -158,6 +193,11 @@ class Mob(Char):
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
         """
+        if self.stun_duration > 0:
+            self.stun_duration -= 1
+            print(f"The {self.name} is stunned and cannot act this turn!")
+            return
+
         random_action = random.randint(1, 3)
 
         if random_action == 1 or random_action == 2 or random_action == 3:
@@ -208,7 +248,7 @@ class Mob(Char):
 
     def spits(self, _, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 1))
-        attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are are stunned!"
+        attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
@@ -225,7 +265,7 @@ new_toon = Warrior("bob")
 new_mob = Mob("goblin")
 
 
-#### TESTING AREA #######
+#### TESTING AREA CODE #######
 
 print(f"You encounter a {new_mob.name}!")
 ##input("Press enter to continue...")
@@ -251,18 +291,18 @@ while new_toon.health > 0 and new_mob.health > 0:
     ## Attack and check if mob or player is stuned or dead
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
-    elif new_toon.stun_duration > 0:
-        print("You are stunned and cannot act this turn!")
-        new_toon.stun_duration -= 1
+    # elif new_toon.stun_duration > 0:
+    #     print("You are stunned and cannot act this turn!")
+    #     new_toon.stun_duration -= 1
     else:
-        print("What will you do?!")
+        # print("What will you do?!")
         new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
 
     if new_toon.health <= 0:
         print("You have been defeated!")
-    elif new_mob.stun_duration > 0:
-        print(f"The {new_mob.name} is stunned and cannot act this turn!")
-        new_mob.stun_duration -= 1
+    # elif new_mob.stun_duration > 0:
+    #     print(f"The {new_mob.name} is stunned and cannot act this turn!")
+    #     new_mob.stun_duration -= 1
     else:
         new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
 
