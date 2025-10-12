@@ -74,9 +74,9 @@ class Char(Items):
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
-        Checks if player is stunned, if so they cannot act.
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
+        stun check is done,
         """
         # Check if player is stunned
         # if stuned decrament stun duration and skip turn
@@ -89,14 +89,30 @@ class Char(Items):
         counter = 1
 
         # list out actions
-        print("What will you do?")
-        print("Choose a action:")
-        for skill in self.actions:
-            print(f"{counter}) {skill}")
-            counter += 1
+        # preform input validation
+        while True:
+            try:
+                print("What will you do?")
+                print("Choose a action:")
+                for skill in self.actions:
+                    print(f"{counter}) {skill}")
+                    counter += 1
 
-        # gets player action and does a hit check
-        action = int(input("-> "))
+                # gets player action
+                action = int(input("-> "))
+                if action < 1 or action > len(self.actions):
+                    counter = 1
+                    print("Invalid input. Please enter a action number.")
+                    continue
+
+            except ValueError:
+                counter = 1
+                print("Invalid input. Please enter a action number.")
+
+            else:
+                break
+
+        # preform hit check
         if action == 1 or action == 2 or action == 3:
             hit, is_crit = self.hit_check(mob_ac, atk_power)
 
@@ -105,6 +121,7 @@ class Char(Items):
                 return False
 
         # gets the action from action list in the child class and calls the method
+        # in the instance method
         if action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
@@ -210,8 +227,8 @@ class Mob(Char):
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
-        Iterates through the actions list and prints them out player. Actions list
-        are function names in each class. getattr is used to call the function.
+        actions list are function names in each class.
+        getattr is used to call the function.
         """
         if self.stun_duration > 0:
             self.stun_duration -= 1
