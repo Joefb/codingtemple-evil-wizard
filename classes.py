@@ -57,7 +57,7 @@ class Char(Items):
         If the roll is a natural 20, it is a critical hit and the second return
 
         """
-        roll = random.randint(20, 20)
+        roll = random.randint(1, 20)
         total_roll = roll + hit_chance
         if roll == 20:
             return roll >= ac, True
@@ -289,22 +289,26 @@ while new_toon.health > 0 and new_mob.health > 0:
     print(f"weapon Damage: {new_mob.weapon_damage}")
 
     ## Attack and check if mob or player is stuned or dead
+    new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
+        break
     # elif new_toon.stun_duration > 0:
     #     print("You are stunned and cannot act this turn!")
     #     new_toon.stun_duration -= 1
-    else:
-        # print("What will you do?!")
-        new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+    # else:
+    # print("What will you do?!")
+    # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
 
+    new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
     if new_toon.health <= 0:
         print("You have been defeated!")
+        break
     # elif new_mob.stun_duration > 0:
     #     print(f"The {new_mob.name} is stunned and cannot act this turn!")
     #     new_mob.stun_duration -= 1
-    else:
-        new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+    # else:
+    #     new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
 
 
 # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
