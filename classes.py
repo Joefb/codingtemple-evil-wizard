@@ -145,16 +145,14 @@ class Warrior(Char):
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+        attack_mesge = f"You strike the {mob_name} for {damage} damage!"
 
-        # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
-        # 10 turn cooldown
+        # Check if enrage is active and apply bonus damage and decrament duration
         if self.enrage_cooldown > 3:
             damage = damage + 10 * 2
             self.enrage_cooldown -= 1
         elif self.enrage_cooldown > 0:
             self.enrage_cooldown -= 1
-
-        attack_mesge = f"You strike the {mob_name} for {damage} damage!"
 
         # check for crit and apply damage
         if is_crit:
@@ -190,6 +188,8 @@ class Warrior(Char):
             self.bash_cooldown = 2
             print(attack_mesge)
 
+    # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
+    # 10 turn cooldown
     def enrage(self, mob_name, is_crit):
         if self.enrage_cooldown > 0:
             print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
