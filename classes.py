@@ -133,15 +133,27 @@ class Warrior(Char):
         self.atk_power += self.weapon_damage[2]
 
         # warrior actions. Each action is a method in this class
-        self.actions = ["strike", "bash", "drink potion"]
+        self.actions = ["strike", "bash", "enrage"]
 
         # set bash damage and cooldown
         self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
         self.bash_cooldown = 0
 
+        # enrage cooldown
+        self.enrage_cooldown = 0
+
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+
+        # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
+        # 10 turn cooldown
+        if self.enrage_cooldown > 3:
+            damage = damage + 10 * 2
+            self.enrage_cooldown -= 1
+        elif self.enrage_cooldown > 0:
+            self.enrage_cooldown -= 1
+
         attack_mesge = f"You strike the {mob_name} for {damage} damage!"
 
         # check for crit and apply damage
@@ -178,8 +190,15 @@ class Warrior(Char):
             self.bash_cooldown = 2
             print(attack_mesge)
 
-    def drink_potion(self, mob_name, is_crit):
-        pass
+    def enrage(self, mob_name, is_crit):
+        if self.enrage_cooldown > 0:
+            print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
+        else:
+            self.enrage_cooldown = 10
+            self.health += 20
+            print("You ENRAGE!")
+            print("You heal 20 hitpoints!")
+            print("For 3 turns Strike has a +10 hit chance, damage, and always crits!")
 
 
 ## GOBILN MOB CLASS
@@ -187,6 +206,7 @@ class Mob(Char):
     def __init__(self, name):
         super().__init__(name, health=25, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
+        self.inventory = {}
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
