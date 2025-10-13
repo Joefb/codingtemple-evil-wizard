@@ -162,11 +162,13 @@ class Warrior(Char):
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
-        attack_mesge = f"You strike the {mob_name} for {damage} damage!"
+        print(f"Damage after roll in strike: {damage}")
+        # attack_msg = f"You strike the {mob_name} for {damage} damage!"
 
         # Check if enrage is active and apply bonus damage and decrament duration
         if self.enrage_cooldown > 3:
             damage = damage + 10 * 2
+            print(f"Damage in enrage if condition: {damage}")
             self.enrage_cooldown -= 1
         elif self.enrage_cooldown > 0:
             self.enrage_cooldown -= 1
@@ -174,12 +176,16 @@ class Warrior(Char):
         # check for crit and apply damage
         if is_crit:
             damage = damage * 2
+            print(f"Damage in crit sucess: {damage}")
             new_mob.health -= damage
             print("You land a CRITICAL STRIKE!")
-            print(attack_mesge)
+            # print(attack_msg)
         else:
-            print(attack_mesge)
+            print(f"Damage after crit check: {damage}")
+            # print(attack_msg)
             new_mob.health -= damage
+
+        print(f"You strike the {mob_name} for {damage} damage!")
 
     def bash(self, mob_name, is_crit):
         damage = self.attack_dmg(1, self.bash_damage)
@@ -207,7 +213,7 @@ class Warrior(Char):
 
     # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
     # 10 turn cooldown
-    def enrage(self, mob_name, is_crit):
+    def enrage(self, _mob_name, _is_crit):
         if self.enrage_cooldown > 0:
             print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
         else:
@@ -221,7 +227,7 @@ class Warrior(Char):
 ## GOBILN MOB CLASS
 class Mob(Char):
     def __init__(self, name):
-        super().__init__(name, health=25, atk_power=2, armor_class=10)
+        super().__init__(name, health=3325, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = {}
 
@@ -316,6 +322,7 @@ while new_toon.health > 0 and new_mob.health > 0:
     print(f"Armor Class: {new_toon.armor_class}")
     print(f"Weapon: {new_toon.weapon_name}")
     print(f"weapon Damage: {new_toon.weapon_damage}")
+    print(f"Enrage Counter: {new_toon.enrage_cooldown}")
     print("---------------------------")
     print("")
     print("--------- Mob Status ---------")
