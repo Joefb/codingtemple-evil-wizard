@@ -35,7 +35,7 @@ class Char(Items):
         self.mana = 0
         self.actions = []
         # inventory
-        self.inventory = {}
+        self.inventory = []
         self.item_key = ""
         self.weapon_name = "Fists"
         self.weapon_damage = (1, 2)
@@ -71,6 +71,31 @@ class Char(Items):
         """
         total_heal = (random.randint(heal_amount[0], heal_amount[1])) + spell_pwr
         return total_heal
+
+    def drink_potion(self, potion_name):
+        """
+        drink_potion checks if the potion is in the players inventory,
+        uses the potion, heals the player, and removes the potion from
+        the inventory
+        uses heal_self to get the healed or manad amount
+        """
+
+        if potion_name not in self.inventory:
+            print("There are no potions in your inventory!")
+
+        elif "heal" in potion_name:
+            heal_amount = self.items.get(potion_name)
+            healed = self.heal_self(heal_amount)
+            self.health += healed
+            print(f"You drink the {potion_name} and heal for {healed} hitpoints!")
+            self.inventory.remove(potion_name)
+
+        elif "mana" in potion_name:
+            mana_amount = self.items.get(potion_name)
+            manad = self.heal_self(mana_amount)
+            self.mana += manad
+            print(f"You drink the {potion_name} and restore {manad} mana!")
+            self.inventory.remove(potion_name)
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
@@ -137,6 +162,11 @@ class Char(Items):
             self.action_method = getattr(self, self.action)
             self.action_method(mob_name, is_crit)
 
+        if action == 4:
+            self.action = self.actions[3]
+            self.action_method = getattr(self, self.action)
+            self.action_method("lesser heal potion")
+
 
 class Warrior(Char):
     def __init__(self, name):
@@ -145,19 +175,16 @@ class Warrior(Char):
         # set starting weapon and get its damage from weapons dict in Items class
         self.weapon_name = "rusty dagger"
         self.weapon_damage = self.weapons.get(self.weapon_name)
-
         # set the atk_power to include the weapon's atk_power bonus
         self.atk_power += self.weapon_damage[2]
-
         # warrior actions. Each action is a method in this class
-        self.actions = ["strike", "bash", "enrage"]
-
+        self.actions = ["strike", "bash", "enrage", "drink_potion"]
         # set bash damage and cooldown
         self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
         self.bash_cooldown = 0
-
         # enrage cooldown
         self.enrage_cooldown = 0
+        self.inventory.append("lesser heal potion")
 
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
@@ -322,6 +349,7 @@ while new_toon.health > 0 and new_mob.health > 0:
     print(f"Weapon: {new_toon.weapon_name}")
     print(f"weapon Damage: {new_toon.weapon_damage}")
     print(f"Enrage Counter: {new_toon.enrage_cooldown}")
+    print(f"Inventory: {new_toon.inventory}")
     print("---------------------------")
     print("")
     print("--------- Mob Status ---------")
