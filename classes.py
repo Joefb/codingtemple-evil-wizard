@@ -72,30 +72,49 @@ class Char(Items):
         total_heal = (random.randint(heal_amount[0], heal_amount[1])) + spell_pwr
         return total_heal
 
-    def drink_potion(self, potion_name):
+    def drink_potion(self):
         """
-        drink_potion checks if the potion is in the players inventory,
-        uses the potion, heals the player, and removes the potion from
-        the inventory
-        uses heal_self to get the healed or manad amount
+        Handles drinking potions from the players inventory.
+        Iterates through the inventory and lists only potions.
+        Uses the potion, and removes potion from inventory
+        Input validation is done.
         """
+        potion_idx = []
+        print("----- Potions Inventory -----")
+        print("Choose a potion to drink:")
+        for idx, item in enumerate(self.inventory):
+            if item in self.items:
+                potion_idx.append(idx)
+                print(f"{idx}: {item}")
+                print("-----------------------------")
+        try:
+            input_idx = int(input("-> "))
+            if input_idx not in potion_idx:
+                print("Invalid input. Please enter a valid potion number.")
+                self.drink_potion()
 
-        if potion_name not in self.inventory:
-            print("There are no potions in your inventory!")
+            elif input_idx in potion_idx:
+                potion_name = self.inventory[input_idx]
 
-        elif "heal" in potion_name:
-            heal_amount = self.items.get(potion_name)
-            healed = self.heal_self(heal_amount)
-            self.health += healed
-            print(f"You drink the {potion_name} and heal for {healed} hitpoints!")
-            self.inventory.remove(potion_name)
+                if "heal" in potion_name:
+                    heal_amount = self.items.get(potion_name)
+                    healed = self.heal_self(heal_amount)
+                    self.health += healed
+                    print(
+                        f"You drink the {potion_name} and heal for {healed} hitpoints!"
+                    )
+                    self.inventory.remove(potion_name)
 
-        elif "mana" in potion_name:
-            mana_amount = self.items.get(potion_name)
-            manad = self.heal_self(mana_amount)
-            self.mana += manad
-            print(f"You drink the {potion_name} and restore {manad} mana!")
-            self.inventory.remove(potion_name)
+                elif "mana" in potion_name:
+                    mana_amount = self.items.get(potion_name)
+                    manad = self.heal_self(mana_amount)
+                    self.mana += manad
+                    print(f"You drink the {potion_name} and restore {manad} mana!")
+                    self.inventory.remove(potion_name)
+
+        except ValueError:
+            print("Invalid number. Please enter a valid potion number.")
+            self.drink_potion()
 
     def loot_mob(self, mob):
         if len(mob.inventory) > 0:
@@ -111,10 +130,6 @@ class Char(Items):
         Prints weapon stats when equipped.
         """
         weapon_idx = []
-        if len(self.inventory) == 0:
-            print("You have no weapons in your inventory!")
-            return
-
         print("----- Weapons Inventory -----")
         print("Choose a weapon to equip:")
         for idx, item in enumerate(self.inventory):
@@ -207,12 +222,32 @@ class Char(Items):
             self.action_method = getattr(self, self.action)
             self.action_method(mob_name, is_crit)
 
+        # drink potion
         if action == 4:
+            # cheks if there are any potions in inventory
+            count_items = []
+            for idx, item in enumerate(self.inventory):
+                if item in self.items:
+                    count_items.append(idx)
+            if len(count_items) == 0:
+                print("You have no potions in your inventory!")
+                return
+
             self.action = self.actions[3]
             self.action_method = getattr(self, self.action)
-            self.action_method("lesser heal potion")
+            self.action_method()
 
+        # equip weapon
         if action == 5:
+            # checks if there are any weapons in inventory
+            count_weapons = []
+            for idx, wep in enumerate(self.inventory):
+                if wep in self.weapons:
+                    count_weapons.append(idx)
+            if len(count_weapons) == 0:
+                print("You have no weapons in your inventory!")
+                return
+
             self.action = self.actions[4]
             self.action_method = getattr(self, self.action)
             self.action_method()
