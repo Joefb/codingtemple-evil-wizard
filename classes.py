@@ -106,6 +106,9 @@ class Char(Items):
     def equip_weapon(self):
         """
         Handles equipping weapons from the players inventory.
+        Iterates through the inventory and lists only weapons.
+        Input validation is done.
+        Prints weapon stats when equipped.
         """
         weapon_idx = []
         if len(self.inventory) == 0:
@@ -131,7 +134,10 @@ class Char(Items):
                 print(f"You equip the {item}!")
                 self.weapon_name = item
                 self.weapon_damage = self.weapons.get(item)
-                print(f"Weapon Stats: {self.weapon_damage}")
+                print("Weapon Stats:")
+                print(f"Damage: {self.weapon_damage[0]}d{self.weapon_damage[1]}")
+                print(f"Attack Power Bonus: {self.weapon_damage[2]}")
+                print(f"Hit Chance Bonus: {self.weapon_damage[2]}")
 
         except ValueError:
             print("Invalid number. Please enter a valid weapon number.")
