@@ -293,41 +293,44 @@ class Mob(Char):
 
     def claws(self, _, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
-        attack_mesge = f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
-            print(attack_mesge)
         else:
             new_toon.health -= damage
-            print(attack_mesge)
+
+        print(
+            f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
+        )
 
     def kicks(self, _, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 6))
-        attack_mesge = f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
-            print(attack_mesge)
         else:
             new_toon.health -= damage
-            print(attack_mesge)
+
+        print(
+            f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
+        )
 
     def spits(self, _, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 1))
-        attack_mesge = f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
             new_toon.health -= damage
             new_toon.stun_duration = 1
-            print(attack_mesge)
         else:
             new_toon.health -= damage
             new_toon.stun_duration = 1
-            print(attack_mesge)
+
+        print(
+            f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
+        )
 
 
 new_toon = Warrior("bob")
