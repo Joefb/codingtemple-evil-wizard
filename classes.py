@@ -150,7 +150,7 @@ class Char(Items):
                 self.weapon_name = item
                 self.weapon_damage = self.weapons.get(item)
                 print("Weapon Stats:")
-                print(f"Damage: {self.weapon_damage[0]}d{self.weapon_damage[1]}")
+                print(f"Damage: {self.weapon_damage[0]} - {self.weapon_damage[1]}")
                 print(f"Attack Power Bonus: {self.weapon_damage[2]}")
                 print(f"Hit Chance Bonus: {self.weapon_damage[2]}")
 
@@ -269,13 +269,8 @@ class Warrior(Char):
         self.bash_cooldown = 0
         # enrage cooldown
         self.enrage_cooldown = 0
-        ##self.inventory.append("lesser heal potion")
-        self.inventory = [
-            "lesser heal potion",
-            "greater heal potion",
-            "rusty dagger",
-            "bronze sword",
-        ]
+        # inventory
+        self.inventory = ["fists"]
 
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
@@ -344,7 +339,7 @@ class Warrior(Char):
 ## GOBILN MOB CLASS
 class Mob(Char):
     def __init__(self, name):
-        super().__init__(name, health=5, atk_power=2, armor_class=10)
+        super().__init__(name, health=25, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
