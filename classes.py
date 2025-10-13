@@ -162,27 +162,25 @@ class Warrior(Char):
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
-        print(f"Damage after roll in strike: {damage}")
-        # attack_msg = f"You strike the {mob_name} for {damage} damage!"
 
         # Check if enrage is active and apply bonus damage and decrament duration
-        if self.enrage_cooldown > 3:
+        if self.enrage_cooldown > 7:
             damage = damage + 10 * 2
-            print(f"Damage in enrage if condition: {damage}")
             self.enrage_cooldown -= 1
+
+        elif self.enrage_cooldown == 7:
+            print("You are no longer Enraged!")
+            self.enrage_cooldown -= 1
+
         elif self.enrage_cooldown > 0:
             self.enrage_cooldown -= 1
 
         # check for crit and apply damage
         if is_crit:
             damage = damage * 2
-            print(f"Damage in crit sucess: {damage}")
             new_mob.health -= damage
             print("You land a CRITICAL STRIKE!")
-            # print(attack_msg)
         else:
-            print(f"Damage after crit check: {damage}")
-            # print(attack_msg)
             new_mob.health -= damage
 
         print(f"You strike the {mob_name} for {damage} damage!")
@@ -216,6 +214,7 @@ class Warrior(Char):
     def enrage(self, _mob_name, _is_crit):
         if self.enrage_cooldown > 0:
             print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
+            self.enrage_cooldown -= 1
         else:
             self.enrage_cooldown = 10
             self.health += 20
