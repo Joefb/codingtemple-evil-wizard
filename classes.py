@@ -97,6 +97,12 @@ class Char(Items):
             print(f"You drink the {potion_name} and restore {manad} mana!")
             self.inventory.remove(potion_name)
 
+    def loot_mob(self, mob):
+        if len(mob.inventory) > 0:
+            for item in mob.inventory:
+                print(f"You loot a {item} from the {mob.name}!")
+                self.inventory.append(item)
+
     def do_action(self, mob_name, mob_ac, atk_power):
         """
         Iterates through the actions list and prints them out player. Actions list
@@ -184,7 +190,7 @@ class Warrior(Char):
         self.bash_cooldown = 0
         # enrage cooldown
         self.enrage_cooldown = 0
-        self.inventory.append("lesser heal potion")
+        ##self.inventory.append("lesser heal potion")
 
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
@@ -253,9 +259,9 @@ class Warrior(Char):
 ## GOBILN MOB CLASS
 class Mob(Char):
     def __init__(self, name):
-        super().__init__(name, health=3325, atk_power=2, armor_class=10)
+        super().__init__(name, health=5, atk_power=2, armor_class=10)
         self.actions = ["claws", "kicks", "spits"]
-        self.inventory = {}
+        self.inventory = ["lesser heal potion"]
 
     def do_action(self, mob_name, mob_ac, atk_power):
         """
@@ -366,6 +372,8 @@ while new_toon.health > 0 and new_mob.health > 0:
     new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
+        new_toon.loot_mob(new_mob)
+        print(f"Inventory: {new_toon.inventory}")
         break
     # elif new_toon.stun_duration > 0:
     #     print("You are stunned and cannot act this turn!")
