@@ -103,6 +103,40 @@ class Char(Items):
                 print(f"You loot a {item} from the {mob.name}!")
                 self.inventory.append(item)
 
+    def equip_weapon(self):
+        """
+        Handles equipping weapons from the players inventory.
+        """
+        weapon_idx = []
+        if len(self.inventory) == 0:
+            print("You have no weapons in your inventory!")
+            return
+
+        print("----- Weapons Inventory -----")
+        print("Choose a weapon to equip:")
+        for idx, item in enumerate(self.inventory):
+            if item in self.weapons:
+                weapon_idx.append(idx)
+                print(f"{idx}: {item}")
+                print("-----------------------------")
+
+        try:
+            equip_idx = int(input("-> "))
+            if equip_idx not in weapon_idx:
+                print("Invalid input. Please enter a valid weapon number.")
+                self.equip_weapon()
+
+            elif equip_idx in weapon_idx:
+                item = self.inventory[equip_idx]
+                print(f"You equip the {item}!")
+                self.weapon_name = item
+                self.weapon_damage = self.weapons.get(item)
+                print(f"Weapon Stats: {self.weapon_damage}")
+
+        except ValueError:
+            print("Invalid number. Please enter a valid weapon number.")
+            self.equip_weapon()
+
     def do_action(self, mob_name, mob_ac, atk_power):
         """
         Iterates through the actions list and prints them out player. Actions list
@@ -118,7 +152,6 @@ class Char(Items):
 
         # used for numbering the actions
         counter = 1
-
         # list out actions
         # preform input validation
         while True:
@@ -173,24 +206,35 @@ class Char(Items):
             self.action_method = getattr(self, self.action)
             self.action_method("lesser heal potion")
 
+        if action == 5:
+            self.action = self.actions[4]
+            self.action_method = getattr(self, self.action)
+            self.action_method()
+
 
 class Warrior(Char):
     def __init__(self, name):
         super().__init__(name, health=50, atk_power=5, armor_class=12)
 
         # set starting weapon and get its damage from weapons dict in Items class
-        self.weapon_name = "rusty dagger"
+        self.weapon_name = "fists"
         self.weapon_damage = self.weapons.get(self.weapon_name)
         # set the atk_power to include the weapon's atk_power bonus
         self.atk_power += self.weapon_damage[2]
         # warrior actions. Each action is a method in this class
-        self.actions = ["strike", "bash", "enrage", "drink_potion"]
+        self.actions = ["strike", "bash", "enrage", "drink_potion", "equip_weapon"]
         # set bash damage and cooldown
         self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
         self.bash_cooldown = 0
         # enrage cooldown
         self.enrage_cooldown = 0
         ##self.inventory.append("lesser heal potion")
+        self.inventory = [
+            "lesser heal potion",
+            "greater heal potion",
+            "rusty dagger",
+            "bronze sword",
+        ]
 
     def strike(self, mob_name, is_crit):
         # Rolls damage and sets attack message
@@ -391,6 +435,13 @@ while new_toon.health > 0 and new_mob.health > 0:
     #     new_mob.stun_duration -= 1
     # else:
     #     new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+
+
+# EQUIP WEAPON EXAMPLE
+# if item in self.weapons:
+#     print(f"You equip the {item}!")
+#     self.weapon_name = item
+#     self.weapon_damage = self.weapons.get(item)
 
 
 # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
