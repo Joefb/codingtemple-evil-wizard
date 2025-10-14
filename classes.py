@@ -311,8 +311,8 @@ class Warrior(Char):
         # check for crit and apply damage and stun
         elif is_crit:
             damage = damage * 2
-            new_mob.health -= damage
-            new_mob.stun_duration = 2
+            mob.health -= damage
+            mob.stun_duration = 2
             self.bash_cooldown = 2
             print("You land a CRITICAL STRIKE!")
             print(attack_mesge)
@@ -420,54 +420,54 @@ class Mob(Char):
 
 
 #### TESTING AREA CODE #######
-new_toon = Warrior("bob")
-new_mob = Mob("goblin")
-
-print(f"You encounter a {new_mob.name}!")
-# input("Press enter to continue...")
-print("")
-
-while new_toon.health > 0 and new_mob.health > 0:
-    print("--------- Toon Status ---------")
-    print(f"{new_toon.name} Health: {new_toon.health}")
-    print(f"{new_mob.name} Health: {new_mob.health}")
-    print(f"Attack Power: {new_toon.atk_power}")
-    print(f"Armor Class: {new_toon.armor_class}")
-    print(f"Weapon: {new_toon.weapon_name}")
-    print(f"weapon Damage: {new_toon.weapon_damage}")
-    print(f"Enrage Counter: {new_toon.enrage_cooldown}")
-    print(f"Inventory: {new_toon.inventory}")
-    print("---------------------------")
-    print("")
-    print("--------- Mob Status ---------")
-    print(f"{new_mob.name} Health: {new_mob.health}")
-    print(f"Attack Power: {new_mob.atk_power}")
-    print(f"Armor Class: {new_mob.armor_class}")
-    print(f"Weapon: {new_mob.weapon_name}")
-    print(f"weapon Damage: {new_mob.weapon_damage}")
-
-    ## Attack and check if mob or player is stuned or dead
-    # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-    new_toon.do_action(new_mob)
-    if new_mob.health <= 0:
-        print(f"You have defeated the {new_mob.name}!")
-        new_toon.loot_mob(new_mob)
-        print(f"Inventory: {new_toon.inventory}")
-        break
-
-    # elif new_toon.stun_duration > 0:
-    #     print("You are stunned and cannot act this turn!")
-    #     new_toon.stun_duration -= 1
-    # else:
-    # print("What will you do?!")
-    # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-    #
-
-    # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-    new_mob.do_action(new_toon)
-    if new_toon.health <= 0:
-        print("You have been defeated!")
-        break
+# new_toon = Warrior("bob")
+# new_mob = Mob("goblin")
+#
+# print(f"You encounter a {new_mob.name}!")
+# # input("Press enter to continue...")
+# print("")
+#
+# while new_toon.health > 0 and new_mob.health > 0:
+#     print("--------- Toon Status ---------")
+#     print(f"{new_toon.name} Health: {new_toon.health}")
+#     print(f"{new_mob.name} Health: {new_mob.health}")
+#     print(f"Attack Power: {new_toon.atk_power}")
+#     print(f"Armor Class: {new_toon.armor_class}")
+#     print(f"Weapon: {new_toon.weapon_name}")
+#     print(f"weapon Damage: {new_toon.weapon_damage}")
+#     print(f"Enrage Counter: {new_toon.enrage_cooldown}")
+#     print(f"Inventory: {new_toon.inventory}")
+#     print("---------------------------")
+#     print("")
+#     print("--------- Mob Status ---------")
+#     print(f"{new_mob.name} Health: {new_mob.health}")
+#     print(f"Attack Power: {new_mob.atk_power}")
+#     print(f"Armor Class: {new_mob.armor_class}")
+#     print(f"Weapon: {new_mob.weapon_name}")
+#     print(f"weapon Damage: {new_mob.weapon_damage}")
+#
+#     ## Attack and check if mob or player is stuned or dead
+#     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+#     new_toon.do_action(new_mob)
+#     if new_mob.health <= 0:
+#         print(f"You have defeated the {new_mob.name}!")
+#         new_toon.loot_mob(new_mob)
+#         print(f"Inventory: {new_toon.inventory}")
+#         break
+#
+#     # elif new_toon.stun_duration > 0:
+#     #     print("You are stunned and cannot act this turn!")
+#     #     new_toon.stun_duration -= 1
+#     # else:
+#     # print("What will you do?!")
+#     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+#     #
+#
+#     # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+#     new_mob.do_action(new_toon)
+#     if new_toon.health <= 0:
+#         print("You have been defeated!")
+#         break
 
 
 # elif new_mob.stun_duration > 0:
