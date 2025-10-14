@@ -157,7 +157,7 @@ class Char(Items):
             print("Invalid number. Please enter a valid weapon number.")
             self.equip_weapon()
 
-    def do_action(self, mob_name, mob_ac, atk_power):
+    def do_action(self, mob, mob_ac, atk_power):
         """
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
@@ -201,7 +201,7 @@ class Char(Items):
             hit, is_crit = self.hit_check(mob_ac, atk_power)
 
             if not hit:
-                print(f"You miss the {mob_name}!")
+                print(f"You miss the {mob.name}!")
                 return False
 
         # gets the action from action list in the child class and calls the method
@@ -209,17 +209,17 @@ class Char(Items):
         if action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(mob, is_crit)
 
         if action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(mob, is_crit)
 
         if action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(mob, is_crit)
 
         # drink potion
         if action == 4:
@@ -271,7 +271,7 @@ class Warrior(Char):
         # inventory
         self.inventory = ["fists"]
 
-    def strike(self, mob_name, is_crit):
+    def strike(self, mob, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
 
@@ -295,12 +295,12 @@ class Warrior(Char):
         else:
             new_mob.health -= damage
 
-        print(f"You strike the {mob_name} for {damage} damage!")
+        print(f"You strike the {mob.name} for {damage} damage!")
 
-    def bash(self, mob_name, is_crit):
+    def bash(self, mob, is_crit):
         damage = self.attack_dmg(1, self.bash_damage)
         attack_mesge = (
-            f"You bash the {mob_name} for {damage} damage!\nThe {mob_name} is stunned!"
+            f"You bash the {mob.name} for {damage} damage!\nThe {mob.name} is stunned!"
         )
         # check if is on bash cooldown
         if self.bash_cooldown > 0:
@@ -323,7 +323,7 @@ class Warrior(Char):
 
     # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
     # 10 turn cooldown
-    def enrage(self, _mob_name, _is_crit):
+    def enrage(self, _mob, _is_crit):
         if self.enrage_cooldown > 0:
             print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
             self.enrage_cooldown -= 1
@@ -342,7 +342,7 @@ class Mob(Char):
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
-    def do_action(self, mob_name, mob_ac, atk_power):
+    def do_action(self, player, mob_ac, atk_power):
         """
         actions list are function names in each class.
         getattr is used to call the function.
@@ -364,17 +364,17 @@ class Mob(Char):
         if random_action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(player.name, is_crit)
 
         if random_action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(player.name, is_crit)
 
         if random_action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            self.action_method(player.name, is_crit)
 
     def claws(self, _, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
