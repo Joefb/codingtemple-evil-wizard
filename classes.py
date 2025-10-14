@@ -1,6 +1,5 @@
 ## Game Classes and items
 import random
-import os
 
 
 ## ITEMS
