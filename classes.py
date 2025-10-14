@@ -157,7 +157,8 @@ class Char(Items):
             print("Invalid number. Please enter a valid weapon number.")
             self.equip_weapon()
 
-    def do_action(self, mob, mob_ac, atk_power):
+    # def do_action(self, mob, mob_ac, atk_power):
+    def do_action(self, mob):
         """
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
@@ -198,7 +199,7 @@ class Char(Items):
 
         # preform hit check
         if action == 1 or action == 2 or action == 3:
-            hit, is_crit = self.hit_check(mob_ac, atk_power)
+            hit, is_crit = self.hit_check(mob.armor_class, self.atk_power)
 
             if not hit:
                 print(f"You miss the {mob.name}!")
@@ -290,10 +291,10 @@ class Warrior(Char):
         # check for crit and apply damage
         if is_crit:
             damage = damage * 2
-            new_mob.health -= damage
+            mob.health -= damage
             print("You land a CRITICAL STRIKE!")
         else:
-            new_mob.health -= damage
+            mob.health -= damage
 
         print(f"You strike the {mob.name} for {damage} damage!")
 
@@ -316,8 +317,8 @@ class Warrior(Char):
             print("You land a CRITICAL STRIKE!")
             print(attack_mesge)
         else:
-            new_mob.stun_duration = 2
-            new_mob.health -= damage
+            mob.stun_duration = 2
+            mob.health -= damage
             self.bash_cooldown = 2
             print(attack_mesge)
 
@@ -342,7 +343,7 @@ class Mob(Char):
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
-    def do_action(self, player, mob_ac, atk_power):
+    def do_action(self, player):
         """
         actions list are function names in each class.
         getattr is used to call the function.
@@ -355,7 +356,7 @@ class Mob(Char):
         random_action = random.randint(1, 3)
 
         if random_action == 1 or random_action == 2 or random_action == 3:
-            hit, is_crit = self.hit_check(mob_ac, atk_power)
+            hit, is_crit = self.hit_check(player.armor_class, self.atk_power)
 
             if not hit:
                 print(f"The {self.name} misses you!")
@@ -364,54 +365,54 @@ class Mob(Char):
         if random_action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(player.name, is_crit)
+            self.action_method(player, is_crit)
 
         if random_action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(player.name, is_crit)
+            self.action_method(player, is_crit)
 
         if random_action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(player.name, is_crit)
+            self.action_method(player, is_crit)
 
-    def claws(self, _, is_crit):
+    def claws(self, player, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
+            player.health -= damage
         else:
-            new_toon.health -= damage
+            player.health -= damage
 
         print(
             f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
         )
 
-    def kicks(self, _, is_crit):
+    def kicks(self, player, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 6))
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
+            player.health -= damage
         else:
-            new_toon.health -= damage
+            player.health -= damage
 
         print(
             f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
         )
 
-    def spits(self, _, is_crit):
+    def spits(self, player, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 1))
         if is_crit:
             print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
-            new_toon.stun_duration = 1
+            player.health -= damage
+            player.stun_duration = 1
         else:
-            new_toon.health -= damage
-            new_toon.stun_duration = 1
+            player.health -= damage
+            player.stun_duration = 1
 
         print(
             f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
@@ -446,7 +447,8 @@ while new_toon.health > 0 and new_mob.health > 0:
     print(f"weapon Damage: {new_mob.weapon_damage}")
 
     ## Attack and check if mob or player is stuned or dead
-    new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+    # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+    new_toon.do_action(new_mob)
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
         new_toon.loot_mob(new_mob)
@@ -461,7 +463,8 @@ while new_toon.health > 0 and new_mob.health > 0:
     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
     #
 
-    new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+    # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+    new_mob.do_action(new_toon)
     if new_toon.health <= 0:
         print("You have been defeated!")
         break
