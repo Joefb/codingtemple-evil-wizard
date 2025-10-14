@@ -18,11 +18,12 @@ class Game:
         input("Press enter to continue...")
         print("")
 
+        self.display_status(player, mob)
         while player.health > 0 and mob.health > 0:
             # os.system("cls" if os.name == "nt" else "clear")
-            self.display_status(player, mob)
+            # self.display_status(player, mob)
             print("")
-            player.do_action(mob)
+            result = str(player.do_action(mob))
             if mob.health <= 0:
                 print(f"You have defeated the {mob.name}!")
                 player.loot_mob(mob)
@@ -35,6 +36,7 @@ class Game:
                 print("You have been defeated!")
                 return
                 # break
+            print(result)
 
     def display_status(self, player, mob):
         print("--------- Toon Status ---------")
