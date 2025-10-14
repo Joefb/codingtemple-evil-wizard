@@ -14,7 +14,7 @@ new_mob = Mob("goblin")
 # new_mob = Mob("goblin")
 
 print(f"You encounter a {new_mob.name}!")
-input("Press enter to continue...")
+# input("Press enter to continue...")
 print("")
 
 while new_toon.health > 0 and new_mob.health > 0:
@@ -37,14 +37,16 @@ while new_toon.health > 0 and new_mob.health > 0:
     print(f"weapon Damage: {new_mob.weapon_damage}")
     #
     #     ## Attack and check if mob or player is stuned or dead
-    new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+    # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
+    new_toon.do_action(new_mob)
     if new_mob.health <= 0:
         print(f"You have defeated the {new_mob.name}!")
         new_toon.loot_mob(new_mob)
         print(f"Inventory: {new_toon.inventory}")
         break
 
-    new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+    # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
+    new_mob.do_action(new_toon)
     if new_toon.health <= 0:
         print("You have been defeated!")
         break
