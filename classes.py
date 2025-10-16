@@ -171,32 +171,6 @@ class Char(Items):
             self.stun_duration -= 1
             return "You are stunned and cannot act this turn!"
 
-        # used for numbering the actions
-        # counter = 1
-        # # list out actions
-        # # preform input validation
-        # while True:
-        #     try:
-        #         print("What will you do?")
-        #         print("Choose a action:")
-        #         for skill in self.actions:
-        #             print(f"{counter}) {skill}")
-        #             counter += 1
-        #
-        #         # gets player action
-        #         action = int(input("-> "))
-        #         if action < 1 or action > len(self.actions):
-        #             counter = 1
-        #             print("Invalid input. Please enter a action number.")
-        #             continue
-        #
-        #     except ValueError:
-        #         counter = 1
-        #         print("Invalid input. Please enter a action number.")
-        #
-        #     else:
-        #         break
-
         # preform hit check
         if action == 1 or action == 2 or action == 3:
             hit, is_crit = self.hit_check(mob.armor_class, self.atk_power)
@@ -214,12 +188,12 @@ class Char(Items):
         if action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob, is_crit)
+            return self.action_method(mob, is_crit)
 
         if action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob, is_crit)
+            return self.action_method(mob, is_crit)
 
         # drink potion
         if action == 4:
@@ -348,11 +322,12 @@ class Mob(Char):
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
-    def do_action(self, _action, mob):
+    def do_action(self, action, mob):
         """
         actions list are function names in each class.
         getattr is used to call the function.
         """
+        _ = action
         if self.stun_duration > 0:
             self.stun_duration -= 1
             return f"The {self.name} is stunned and cannot act this turn!"
@@ -368,17 +343,17 @@ class Mob(Char):
         if random_action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob, is_crit)
+            return self.action_method(mob, is_crit)
 
         if random_action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob, is_crit)
+            return self.action_method(mob, is_crit)
 
         if random_action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob, is_crit)
+            return self.action_method(mob, is_crit)
 
     def claws(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
