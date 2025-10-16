@@ -159,7 +159,7 @@ class Char(Items):
             self.equip_weapon()
 
     # def do_action(self, mob, mob_ac, atk_power):
-    def do_action(self, mob):
+    def do_action(self, action, mob):
         """
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
@@ -172,30 +172,30 @@ class Char(Items):
             return "You are stunned and cannot act this turn!"
 
         # used for numbering the actions
-        counter = 1
-        # list out actions
-        # preform input validation
-        while True:
-            try:
-                print("What will you do?")
-                print("Choose a action:")
-                for skill in self.actions:
-                    print(f"{counter}) {skill}")
-                    counter += 1
-
-                # gets player action
-                action = int(input("-> "))
-                if action < 1 or action > len(self.actions):
-                    counter = 1
-                    print("Invalid input. Please enter a action number.")
-                    continue
-
-            except ValueError:
-                counter = 1
-                print("Invalid input. Please enter a action number.")
-
-            else:
-                break
+        # counter = 1
+        # # list out actions
+        # # preform input validation
+        # while True:
+        #     try:
+        #         print("What will you do?")
+        #         print("Choose a action:")
+        #         for skill in self.actions:
+        #             print(f"{counter}) {skill}")
+        #             counter += 1
+        #
+        #         # gets player action
+        #         action = int(input("-> "))
+        #         if action < 1 or action > len(self.actions):
+        #             counter = 1
+        #             print("Invalid input. Please enter a action number.")
+        #             continue
+        #
+        #     except ValueError:
+        #         counter = 1
+        #         print("Invalid input. Please enter a action number.")
+        #
+        #     else:
+        #         break
 
         # preform hit check
         if action == 1 or action == 2 or action == 3:
@@ -287,16 +287,14 @@ class Warrior(Char):
 
         # check for crit and apply damage
         if is_crit:
-            damage = damage * 2
+            damage += damage * 2
             mob.health -= damage
             if self.enrage_cooldown == 7:
-                # self.enrage_cooldown -= 1
                 return f"""
                             You are no longer Enraged!
                             CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!
                        """
-        else:
-            # self.enrage_cooldown -= 1
+        elif is_crit and self.enrage_cooldown < 7:
             mob.health -= damage
             return f"CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!"
 
@@ -350,7 +348,7 @@ class Mob(Char):
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
-    def do_action(self, player):
+    def do_action(self, _action, mob):
         """
         actions list are function names in each class.
         getattr is used to call the function.
@@ -362,7 +360,7 @@ class Mob(Char):
         random_action = random.randint(1, 3)
 
         if random_action == 1 or random_action == 2 or random_action == 3:
-            hit, is_crit = self.hit_check(player.armor_class, self.atk_power)
+            hit, is_crit = self.hit_check(mob.armor_class, self.atk_power)
 
             if not hit:
                 return f"The {self.name} misses you!"
@@ -370,58 +368,58 @@ class Mob(Char):
         if random_action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(player, is_crit)
+            self.action_method(mob, is_crit)
 
         if random_action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(player, is_crit)
+            self.action_method(mob, is_crit)
 
         if random_action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(player, is_crit)
+            self.action_method(mob, is_crit)
 
-    def claws(self, player, is_crit):
+    def claws(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
         if is_crit:
             damage = damage * 2
-            player.health -= damage
+            mob.health -= damage
             return f"""
                     The {self.name} lands a CRITICAL STRIKE!
                     The {self.name} snarles at you and slashes you with their claws for {damage} of damage!
                    """
         else:
-            player.health -= damage
+            mob.health -= damage
             return f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
 
-    def kicks(self, player, is_crit):
+    def kicks(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 6))
 
         if is_crit:
             damage = damage * 2
-            player.health -= damage
+            mob.health -= damage
             return f"""
                     The {self.name} lands a CRITICAL STRIKE!
                     "Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!
                     """
         else:
-            player.health -= damage
+            mob.health -= damage
             return f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
 
-    def spits(self, player, is_crit):
+    def spits(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 1))
         if is_crit:
             damage = damage * 2
-            player.health -= damage
-            player.stun_duration = 1
+            mob.health -= damage
+            mob.stun_duration = 1
             return f"""
                     The {self.name} lands a CRITICAL STRIKE!
                     The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!
                     """
         else:
-            player.health -= damage
-            player.stun_duration = 1
+            mob.health -= damage
+            mob.stun_duration = 1
             return f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
 
 
