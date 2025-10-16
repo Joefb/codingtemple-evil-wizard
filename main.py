@@ -18,12 +18,38 @@ class Game:
         input("Press enter to continue...")
         print("")
 
-        self.display_status(player, mob)
+        # self.display_status(player, mob)
+        counter = 1
+        # while True:
         while player.health > 0 and mob.health > 0:
+            try:
+                print("What will you do?")
+                print("Choose a action:")
+                for skill in player.actions:
+                    print(f"{counter}) {skill}")
+                    counter += 1
+
+                # gets player action
+                action = int(input("-> "))
+                if action < 1 or action > len(player.actions):
+                    counter = 1
+                    print("Invalid input. Please enter a action number.")
+                    continue
+
+            except ValueError:
+                counter = 1
+                print("Invalid input. Please enter a action number.")
+
+                # else:
+                # continue
+
+            # while player.health > 0 and mob.health > 0:
             # os.system("cls" if os.name == "nt" else "clear")
             # self.display_status(player, mob)
             print("")
-            result = str(player.do_action(mob))
+            counter = 1
+            player_action_result = str(player.do_action(action, mob))
+            # mob_action_result = str(mob.do_action(action, player))
             if mob.health <= 0:
                 print(f"You have defeated the {mob.name}!")
                 player.loot_mob(mob)
@@ -31,12 +57,17 @@ class Game:
                 return
                 # break
 
-            mob.do_action(player)
+            # mob.do_action(player)
+            _action = None
+            mob_action_result = str(mob.do_action(_action, player))
             if player.health <= 0:
                 print("You have been defeated!")
                 return
                 # break
-            print(result)
+
+            # prints the player damage
+            print(player_action_result)
+            print(mob_action_result)
 
     def display_status(self, player, mob):
         print("--------- Toon Status ---------")
