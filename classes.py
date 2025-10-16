@@ -322,12 +322,12 @@ class Mob(Char):
         self.actions = ["claws", "kicks", "spits"]
         self.inventory = ["lesser heal potion"]
 
-    def do_action(self, action, mob):
+    def do_action(self, _unused_action, mob):
         """
         actions list are function names in each class.
         getattr is used to call the function.
         """
-        _ = action
+        _ = _unused_action
         if self.stun_duration > 0:
             self.stun_duration -= 1
             return f"The {self.name} is stunned and cannot act this turn!"

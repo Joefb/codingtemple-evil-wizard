@@ -49,6 +49,7 @@ class Game:
             print("")
             counter = 1
             player_action_result = str(player.do_action(action, mob))
+            mob_action_result = str(mob.do_action(None, player))
             # mob_action_result = str(mob.do_action(action, player))
             if mob.health <= 0:
                 print(f"You have defeated the {mob.name}!")
@@ -58,8 +59,6 @@ class Game:
                 # break
 
             # mob.do_action(player)
-            _action = None
-            mob_action_result = str(mob.do_action(_action, player))
             if player.health <= 0:
                 print("You have been defeated!")
                 return
