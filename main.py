@@ -8,91 +8,96 @@ class Game:
         self.player = player
         self.mob = mob
 
+    def display_status(self, player, mob):
+        """Displays a status 'bar' for player and mob."""
+        status = f"""
+{"=" * 40}
+| Player: {player.name:<10} 
+{"-" * 40}
+| HP: {player.health:>3} | ATK: {player.atk_power:>2} | AC: {player.armor_class:>} 
+{"-" * 40}
+| Weapon: {player.weapon_name:<20} 
+| Inventory: {", ".join(player.inventory) if player.inventory else "Empty":<30} 
+{"=" * 40}
+            """
+        return status
+
     def battle(self, player, mob):
         """
-        Handles battle loop
+        Handles battle loop with a clean UI: status bar, damage results, and actions.
         """
-        # clear the console
+        # Clear the console
         os.system("cls" if os.name == "nt" else "clear")
         print(f"You encounter a {mob.name}!")
         input("Press enter to continue...")
         print("")
 
-        # self.display_status(player, mob)
-        counter = 1
-        # while True:
         while player.health > 0 and mob.health > 0:
-            try:
-                print("What will you do?")
-                print("Choose a action:")
-                for skill in player.actions:
-                    print(f"{counter}) {skill}")
-                    counter += 1
+            # Clear console
+            os.system("cls" if os.name == "nt" else "clear")
 
-                # gets player action
+            # Display status bar
+            print(self.display_status(player, mob))
+
+            # Display damage results
+            if "player_action_result" in locals() and "mob_action_result" in locals():
+                print("=== Battle Results ===")
+                print(player_action_result)
+                print(mob_action_result)
+                print("=" * 20)
+
+            # Display player actions
+            print(f"\nMob: {mob.name:}")
+            print("=== Actions ===")
+            for idx, skill in enumerate(player.actions, 1):
+                print(f"{idx}) {skill}")
+            print("=" * 20)
+
+            # Get player action with input validation
+            try:
                 action = int(input("-> "))
                 if action < 1 or action > len(player.actions):
-                    counter = 1
-                    print("Invalid input. Please enter a action number.")
+                    print("Invalid input. Please enter a valid action number.")
+                    # input("Press enter to continue...")
                     continue
-
             except ValueError:
-                counter = 1
-                print("Invalid input. Please enter a action number.")
+                print("Invalid input. Please enter a valid action number.")
+                input("Press enter to continue...")
+                continue
 
-                # else:
-                # continue
-
-            # while player.health > 0 and mob.health > 0:
-            # os.system("cls" if os.name == "nt" else "clear")
-            # self.display_status(player, mob)
-            print("")
-            counter = 1
+            # Perform actions
             player_action_result = str(player.do_action(action, mob))
-            mob_action_result = str(mob.do_action(None, player))
-            # mob_action_result = str(mob.do_action(action, player))
             if mob.health <= 0:
+                print("=== Battle Results ===")
+                print(player_action_result)
+                print("=" * 20)
+                print(self.display_status(player, mob))  # Show final status
                 print(f"You have defeated the {mob.name}!")
-                player.loot_mob(mob)
-                print(f"Inventory: {player.inventory}")
+                loot_result = player.loot_mob(mob)
+                if loot_result:
+                    print(loot_result)
+                print(
+                    f"Inventory: {', '.join(player.inventory) if player.inventory else 'Empty'}"
+                )
                 return
-                # break
 
-            # mob.do_action(player)
+            mob_action_result = str(mob.do_action(None, player))
             if player.health <= 0:
+                print(self.display_status(player, mob))  # Show final status
                 print("You have been defeated!")
                 return
-                # break
-
-            # prints the player damage
-            print(player_action_result)
-            print(mob_action_result)
-
-    def display_status(self, player, mob):
-        print("--------- Toon Status ---------")
-        print(f"{new_toon.name} Health: {new_toon.health}")
-        print(f"Attack Power: {new_toon.atk_power}")
-        print(f"Armor Class: {new_toon.armor_class}")
-        print(f"Weapon: {new_toon.weapon_name}")
-        print(f"weapon Damage: {new_toon.weapon_damage}")
-        print(f"Enrage Counter: {new_toon.enrage_cooldown}")
-        print(f"Inventory: {new_toon.inventory}")
-        print("---------------------------")
-        print("")
-        print("--------- Mob Status ---------")
-        print(f"{new_mob.name} Health: {new_mob.health}")
-        print(f"Attack Power: {new_mob.atk_power}")
-        print(f"Armor Class: {new_mob.armor_class}")
-        print(f"Weapon: {new_mob.weapon_name}")
-        print(f"weapon Damage: {new_mob.weapon_damage}")
-        print(f"Inventory: {new_mob.inventory}")
 
 
 #### TESTING AREA CODE #######
-new_toon = classes.Warrior("bob")
-new_mob = classes.Mob("goblin")
+new_toon = classes.Warrior("Bob")
+new_mob = classes.Mob("Goblin")
 game = Game(new_toon, new_mob)
 game.battle(new_toon, new_mob)
+
+# new_toon = classes.Warrior("bob")
+# new_mob = classes.Mob("goblin")
+# game = Game(new_toon, new_mob)
+# game.battle(new_toon, new_mob)
 # new_toon = Warrior("bob")
 # new_mob = Mob("goblin")
 
