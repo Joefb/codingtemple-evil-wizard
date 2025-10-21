@@ -309,9 +309,9 @@ class Warrior(Char):
             self.enrage_cooldown = 10
             self.health += 20
             return """
-                    You ENRAGE!
-                    You heal for 20 hitpoints!
-                    For 3 turns Strike has a +10 hit chance, damage, and always crits!
+You ENRAGE!
+You heal for 20 hitpoints!
+For 3 turns Strike has a +10 hit chance, damage, and always crits!
                     """
 
 
@@ -361,8 +361,8 @@ class Mob(Char):
             damage = damage * 2
             mob.health -= damage
             return f"""
-                    The {self.name} lands a CRITICAL STRIKE!
-                    The {self.name} snarles at you and slashes you with their claws for {damage} of damage!
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} snarles at you and slashes you with their claws for {damage} of damage!
                    """
         else:
             mob.health -= damage
@@ -375,8 +375,8 @@ class Mob(Char):
             damage = damage * 2
             mob.health -= damage
             return f"""
-                    The {self.name} lands a CRITICAL STRIKE!
-                    "Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!
+The {self.name} lands a CRITICAL STRIKE!
+"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!
                     """
         else:
             mob.health -= damage
@@ -389,8 +389,8 @@ class Mob(Char):
             mob.health -= damage
             mob.stun_duration = 1
             return f"""
-                    The {self.name} lands a CRITICAL STRIKE!
-                    The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!
                     """
         else:
             mob.health -= damage
