@@ -100,17 +100,17 @@ class Char(Items):
                     heal_amount = self.items.get(potion_name)
                     healed = self.heal_self(heal_amount)
                     self.health += healed
-                    print(
+                    self.inventory.remove(potion_name)
+                    return (
                         f"You drink the {potion_name} and heal for {healed} hitpoints!"
                     )
-                    self.inventory.remove(potion_name)
 
                 elif "mana" in potion_name:
                     mana_amount = self.items.get(potion_name)
                     manad = self.heal_self(mana_amount)
                     self.mana += manad
-                    print(f"You drink the {potion_name} and restore {manad} mana!")
                     self.inventory.remove(potion_name)
+                    return f"You drink the {potion_name} and restore {manad} mana!"
 
         except ValueError:
             print("Invalid number. Please enter a valid potion number.")
@@ -210,7 +210,7 @@ class Char(Items):
 
             self.action = self.actions[3]
             self.action_method = getattr(self, self.action)
-            self.action_method()
+            return self.action_method()
 
         # equip weapon
         if action == 5:
