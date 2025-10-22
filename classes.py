@@ -117,10 +117,13 @@ class Char(Items):
             self.drink_potion()
 
     def loot_mob(self, mob):
+        looted_items = ""
         if len(mob.inventory) > 0:
             for item in mob.inventory:
                 self.inventory.append(item)
-                return f"You loot a {item} from the {mob.name}!"
+                looted_items += f"{item}, "
+
+            return f"You loot {looted_items}from the {mob.name}!"
 
     def equip_weapon(self):
         """
