@@ -15,7 +15,7 @@ class Items:
 
         self.weapons = {
             "fists": (1, 2, 0),
-            "rusty dagger": (1, 4, 0),
+            "rusty dagger": (1, 6, 0),
             "bronze sword": (3, 10, 1),
             "Mace of the Ancient Gods": (5, 15, 8),
             "broken wand": (1, 2, 0),
@@ -156,6 +156,7 @@ class Char(Items):
                 print(f"Damage: {self.weapon_damage[0]} - {self.weapon_damage[1]}")
                 print(f"Attack Power Bonus: {self.weapon_damage[2]}")
                 print(f"Hit Chance Bonus: {self.weapon_damage[2]}")
+                input("Press enter to continue...")
 
         except ValueError:
             print("Invalid number. Please enter a valid weapon number.")
@@ -357,6 +358,70 @@ class Mob(Char):
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
             return self.action_method(mob, is_crit)
+
+
+class Wizard(Mob):
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["fireball", "meteor", "brimstone"]
+        self.inventory = ["scroll of escape"]
+
+    def fireball(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 8))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers.
+                """
+        else:
+            mob.health -= damage
+            # return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+            return f"""
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers."
+"""
+
+    def meteor(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+        else:
+            mob.health -= damage
+            return f"""
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+
+    def brimstone(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (4, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
 
 
 ## SIREN MOB
