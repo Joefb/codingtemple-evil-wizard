@@ -90,10 +90,15 @@ class Game:
 
 #### TESTING AREA CODE #######
 new_toon = classes.Warrior("Bob")
-new_mob = classes.Mob("Goblin")
+# new_mob = classes.Goblin("Goblin", 30, 3, 11)
+new_mob = classes.Goblin("Goblin", 30, 3, 11)
+# new_mob = classes.Siren("Siren", 30, 5, 12)
 game = Game(new_toon, new_mob)
 game.battle(new_toon, new_mob)
-
+input("Press enter to continue...")
+# new_mob = classes.Goblin("Goblin", 30, 3, 11)
+new_mob = classes.Siren("Siren", 30, 5, 12)
+game.battle(new_toon, new_mob)
 # new_toon = classes.Warrior("bob")
 # new_mob = classes.Mob("goblin")
 # game = Game(new_toon, new_mob)

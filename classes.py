@@ -317,10 +317,10 @@ For 3 turns Strike has a +10 hit chance, damage, and always crits!
 
 ## GOBILN MOB CLASS
 class Mob(Char):
-    def __init__(self, name):
-        super().__init__(name, health=25, atk_power=2, armor_class=10)
-        self.actions = ["claws", "kicks", "spits"]
-        self.inventory = ["lesser heal potion"]
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = []
+        self.inventory = []
 
     def do_action(self, _unused_action, mob):
         """
@@ -355,8 +355,75 @@ class Mob(Char):
             self.action_method = getattr(self, self.action)
             return self.action_method(mob, is_crit)
 
-    def claws(self, mob, is_crit):
+
+## SIREN MOB
+class Siren(Mob):
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["mezmerize", "heal", "lull"]
+        self.inventory = ["bronze sword", "lesser heal potion"]
+
+    ## MEZMERIZE ##
+    def mezmerize(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} mezmerizes you. You fall in love, loose control and stab yourself for {damage} of damage!
+                   """
+        else:
+            mob.health -= damage
+            return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+
+    ## HEAL ##
+    def heal(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to sing. You see their wounds heal!
+                   """
+        else:
+            self.health += heal_amount
+            return f"The {self.name} begins to sing. You see her wounds heal!"
+
+    def lull(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+
+
+## GOBLIN MOB
+class Goblin(Mob):
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["claws", "kicks", "spits"]
+        self.inventory = ["rusty dagger", "lesser heal potion"]
+
+    def claws(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (1, 6))
         if is_crit:
             damage = damage * 2
             mob.health -= damage
