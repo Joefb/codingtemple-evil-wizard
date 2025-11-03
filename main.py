@@ -98,17 +98,18 @@ class Game:
         print("")
         print("Choose your class:")
         print("1) Warrior")
-        print("2) Wizard")
+        print("2) Druid")
         class_choice = input("-> ")
 
         if class_choice == "1":
-            new_char = classes.Warrior(name)
+            new_toon = classes.Warrior(name)
         elif class_choice == "2":
-            new_char = classes.Wizard(name)
+            new_toon = classes.Druid(name)
 
 
 def main():
     new_toon = classes.Warrior("Bob")
+    new_toon = classes.Druid("Bob")
     # new_mob = classes.Goblin("Goblin", 30, 3, 11)
     # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
     new_mob = classes.Siren("Siren", 30, 5, 12)

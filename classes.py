@@ -18,9 +18,9 @@ class Items:
             "rusty dagger": (1, 6, 0),
             "bronze sword": (3, 10, 1),
             "Mace of the Ancient Gods": (5, 15, 8),
-            "broken wand": (1, 2, 0),
-            "glowing wand": (3, 6, 3),
-            "Wand of Eternal Destruction": (6, 12, 10),
+            "broken staff": (1, 2, 0),
+            "glowing staff": (3, 6, 3),
+            "Staff of Eternal Destruction": (6, 12, 10),
         }
 
 
@@ -226,6 +226,71 @@ class Char(Items):
             self.action = self.actions[4]
             self.action_method = getattr(self, self.action)
             self.action_method()
+
+
+## Player Classes
+class Druid(Char):
+    def __init__(self, name):
+        super().__init__(name, health=40, atk_power=2, armor_class=8)
+        # set starting weapon and get its damage from weapons dict in Items class
+        self.weapon_name = "fists"
+        self.weapon_damage = self.weapons.get(self.weapon_name)
+        # set the atk_power to include the weapon's atk_power bonus
+        self.atk_power += self.weapon_damage[2]
+        #  actions. Each action is a method in this class
+        self.actions = [
+            "strike",
+            "natures_touch",
+            "starfire",
+            "drink_potion",
+            "equip_weapon",
+        ]
+        # set bash damage and cooldown
+        self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
+        # inventory
+        self.inventory = ["fists"]
+
+    def strike(self, mob, is_crit):
+        # Rolls damage and sets attack message
+        damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+
+        # check for crit and apply damage
+        if is_crit:
+            damage += damage * 2
+            mob.health -= damage
+            return f"CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!"
+
+        mob.health -= damage
+        return f"You strike the {mob.name} for {damage} damage!"
+
+    def natures_touch(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+You land a CRITICAL STRIKE!
+You heal for {heal_amount} hitpoints!
+                   """
+        else:
+            self.health += heal_amount
+            return f"You heal for {heal_amount} hitpoints!"
+
+    def starfire(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+You land a CRITICAL STRIKE!
+You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!
+                   """
+
+        mob.health -= damage
+        return f"You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!"
 
 
 class Warrior(Char):
