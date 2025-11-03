@@ -321,10 +321,6 @@ class Warrior(Char):
             damage = damage + 10 * 2
             self.enrage_cooldown -= 1
 
-        # elif self.enrage_cooldown == 7:
-        #     print("You are no longer Enraged!")
-        #     self.enrage_cooldown -= 1
-
         elif self.enrage_cooldown > 0:
             self.enrage_cooldown -= 1
 
@@ -389,7 +385,6 @@ class Mob(Char):
     def __init__(self, name, health, atk_power, armor_class):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = []
-        # self.inventory = inventory
 
     def do_action(self, _unused_action, mob):
         """
@@ -430,7 +425,6 @@ class Wizard(Mob):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = ["fireball", "meteor", "brimstone"]
         self.inventory = inventory
-        # self.inventory = ["scroll of escape"]
 
     def fireball(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (2, 8))
@@ -496,7 +490,6 @@ class Siren(Mob):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = ["mezmerize", "heal", "lull"]
         self.inventory = inventory
-        # self.inventory = ["bronze sword", "lesser heal potion"]
 
     ## MEZMERIZE ##
     def mezmerize(self, mob, is_crit):
@@ -602,118 +595,3 @@ The {self.name} spits in your eyes for {damage} damage as they smile and kackle!
 
 
 #### TESTING AREA CODE #######
-# new_toon = Warrior("bob")
-# new_mob = Mob("goblin")
-#
-# print(f"You encounter a {new_mob.name}!")
-# # input("Press enter to continue...")
-# print("")
-#
-# while new_toon.health > 0 and new_mob.health > 0:
-#     print("--------- Toon Status ---------")
-#     print(f"{new_toon.name} Health: {new_toon.health}")
-#     print(f"{new_mob.name} Health: {new_mob.health}")
-#     print(f"Attack Power: {new_toon.atk_power}")
-#     print(f"Armor Class: {new_toon.armor_class}")
-#     print(f"Weapon: {new_toon.weapon_name}")
-#     print(f"weapon Damage: {new_toon.weapon_damage}")
-#     print(f"Enrage Counter: {new_toon.enrage_cooldown}")
-#     print(f"Inventory: {new_toon.inventory}")
-#     print("---------------------------")
-#     print("")
-#     print("--------- Mob Status ---------")
-#     print(f"{new_mob.name} Health: {new_mob.health}")
-#     print(f"Attack Power: {new_mob.atk_power}")
-#     print(f"Armor Class: {new_mob.armor_class}")
-#     print(f"Weapon: {new_mob.weapon_name}")
-#     print(f"weapon Damage: {new_mob.weapon_damage}")
-#
-#     ## Attack and check if mob or player is stuned or dead
-#     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-#     new_toon.do_action(new_mob)
-#     if new_mob.health <= 0:
-#         print(f"You have defeated the {new_mob.name}!")
-#         new_toon.loot_mob(new_mob)
-#         print(f"Inventory: {new_toon.inventory}")
-#         break
-#
-#     # elif new_toon.stun_duration > 0:
-#     #     print("You are stunned and cannot act this turn!")
-#     #     new_toon.stun_duration -= 1
-#     # else:
-#     # print("What will you do?!")
-#     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-#     #
-#
-#     # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-#     new_mob.do_action(new_toon)
-#     if new_toon.health <= 0:
-#         print("You have been defeated!")
-#         break
-
-
-# elif new_mob.stun_duration > 0:
-#     print(f"The {new_mob.name} is stunned and cannot act this turn!")
-#     new_mob.stun_duration -= 1
-# else:
-#     new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-
-
-# EQUIP WEAPON EXAMPLE
-# if item in self.weapons:
-#     print(f"You equip the {item}!")
-#     self.weapon_name = item
-#     self.weapon_damage = self.weapons.get(item)
-
-
-# new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-# print(
-#     f"new_toon: {new_toon.name}, {new_toon.health}, {new_toon.atk_power}, {new_toon.armor_class}"
-# )
-# print(f"{new_toon.weapon_damage}")
-# print(type(new_toon.weapon_damage))
-# print(new_mob.armor_class)
-# print(new_toon.armor_class)
-## INVENTORY EXAMPLES
-# new_toon.item_key = "lesser heal potion"
-# print(f"{new_toon.name} has found a {new_toon.items.get(new_toon.item_key)}")
-# new_toon.inventory[new_toon.item_key] = new_toon.items.get(new_toon.item_key)
-# print(f"inventory {new_toon.inventory}")
-# new_toon.do_action()
-
-
-# new_toon.inventory(new_toon.items.get("lesser heal potion"))
-# print(f"{new_toon.name} has found a {new_toon.items.get(item_key)}")
-# new_toon.inventory["lesser heal potion"] = new_toon.items.get("lesser heal potion")
-# print(f"item: {new_toon.items}")
-
-# print(new_toon.test())
-# new_toon = Warrior("bob", 100, 3, 15)
-# print(new_toon.attack_dmg(3, (1, 5)))
-# print(new_toon.hit_check(10, new_toon.atk_power))
-#
-# def do_action(self, mob_name, mob_ac, atk_power):
-#     counter = 1
-#
-#     print("Choose a action:")
-#     for skill in self.actions:
-#         print(f"{counter}) {skill}")
-#         counter += 1
-#
-#     action = int(input("-> "))
-#     if action == 1 or action == 2:
-#         hit, is_crit = self.hit_check(mob_ac, atk_power)
-#
-#         if not hit:
-#             # return f"You miss the {mob_name}!"
-#             print(f"You miss the {mob_name}!")
-#             return False
-#
-#     if action == 1:
-#         self.strike(mob_name, is_crit)
-#
-#     if action == 2:
-#         pass
-#
-#     if action == 3:
-#         pass

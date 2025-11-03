@@ -119,97 +119,14 @@ def main():
             continue
 
     game = Game(new_toon)
-    new_mob = classes.Goblin("Goblin", 30, 3, 11)
+    # new_mob = classes.Goblin("Goblin", 30, 3, 11, [])
+    new_mob = classes.Goblin(
+        "Scrawny Goblin", 15, 3, 8, ["rusty dagger", "lesser heal potion"]
+    )
     game.battle(new_toon, new_mob)
-
-    # new_toon = classes.Warrior("Bob")
-    # new_toon = classes.Druid("Bob")
-    # new_mob = classes.Goblin("Goblin", 30, 3, 11)
-    # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
-    # new_mob = classes.Siren("Siren", 20, 5, 9, ["bronze sword", "lesser heal potion"])
-    # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
-    # game = Game(new_toon, new_mob)
-    # game.battle(new_toon, new_mob)
-
-    # self.inventory = ["bronze sword", "lesser heal potion"]
-
-    # def print_welcome(self):
-    #     print("Welcome to Evil Wizard!!")
-
-    def create_char(self):
-        os.system("cls" if os.name == "nt" else "clear")
-        print("Create your character:")
-        print("Enter your name young adventurer: ")
-        name = input("-> ")
-        print("")
-        print("Choose your class:")
-        print("1) Warrior")
-        print("2) Druid")
-        class_choice = input("-> ")
-
-        if class_choice == "1":
-            new_toon = classes.Warrior(name)
-        elif class_choice == "2":
-            new_toon = classes.Druid(name)
 
 
 if __name__ == "__main__":
     main()
 
 #### TESTING AREA CODE #######
-# new_toon = classes.Warrior("Bob")
-# new_mob = classes.Goblin("Goblin", 30, 3, 11)
-# new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
-# new_mob = classes.Siren("Siren", 30, 5, 12)
-# new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
-# game = Game(new_toon, new_mob)
-# game.battle(new_toon, new_mob)
-# input("Press enter to continue...")
-# new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
-# new_mob = classes.Goblin("Goblin", 30, 3, 11)
-# new_mob = classes.Siren("Enraged Siren", 30, 5, 12)
-# game.battle(new_toon, new_mob)
-# new_toon = classes.Warrior("bob")
-# new_mob = classes.Mob("goblin")
-# game = Game(new_toon, new_mob)
-# game.battle(new_toon, new_mob)
-# new_toon = Warrior("bob")
-# new_mob = Mob("goblin")
-
-# print(f"You encounter a {new_mob.name}!")
-# # input("Press enter to continue...")
-# print("")
-#
-# while new_toon.health > 0 and new_mob.health > 0:
-#     print("--------- Toon Status ---------")
-#     print(f"{new_toon.name} Health: {new_toon.health}")
-#     print(f"Attack Power: {new_toon.atk_power}")
-#     print(f"Armor Class: {new_toon.armor_class}")
-#     print(f"Weapon: {new_toon.weapon_name}")
-#     print(f"weapon Damage: {new_toon.weapon_damage}")
-#     print(f"Enrage Counter: {new_toon.enrage_cooldown}")
-#     print(f"Inventory: {new_toon.inventory}")
-#     print("---------------------------")
-#     print("")
-#     print("--------- Mob Status ---------")
-#     print(f"{new_mob.name} Health: {new_mob.health}")
-#     print(f"Attack Power: {new_mob.atk_power}")
-#     print(f"Armor Class: {new_mob.armor_class}")
-#     print(f"Weapon: {new_mob.weapon_name}")
-#     print(f"weapon Damage: {new_mob.weapon_damage}")
-#     print(f"Inventory: {new_mob.inventory}")
-#     #
-#     #     ## Attack and check if mob or player is stuned or dead
-#     # new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-#     new_toon.do_action(new_mob)
-#     if new_mob.health <= 0:
-#         print(f"You have defeated the {new_mob.name}!")
-#         new_toon.loot_mob(new_mob)
-#         print(f"Inventory: {new_toon.inventory}")
-#         break
-#
-#     # new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-#     new_mob.do_action(new_toon)
-#     if new_toon.health <= 0:
-#         print("You have been defeated!")
-#         break
