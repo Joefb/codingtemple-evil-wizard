@@ -231,7 +231,7 @@ class Char(Items):
 ## Player Classes
 class Druid(Char):
     def __init__(self, name):
-        super().__init__(name, health=40, atk_power=2, armor_class=8)
+        super().__init__(name, health=40, atk_power=20, armor_class=8)
         # set starting weapon and get its damage from weapons dict in Items class
         self.weapon_name = "fists"
         self.weapon_damage = self.weapons.get(self.weapon_name)
@@ -389,7 +389,7 @@ class Mob(Char):
     def __init__(self, name, health, atk_power, armor_class):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = []
-        self.inventory = []
+        # self.inventory = inventory
 
     def do_action(self, _unused_action, mob):
         """
@@ -426,10 +426,11 @@ class Mob(Char):
 
 
 class Wizard(Mob):
-    def __init__(self, name, health, atk_power, armor_class):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = ["fireball", "meteor", "brimstone"]
-        self.inventory = ["scroll of escape"]
+        self.inventory = inventory
+        # self.inventory = ["scroll of escape"]
 
     def fireball(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (2, 8))
@@ -491,10 +492,11 @@ The molten brimstone burns you for {damage} damage and you are stunned by the he
 
 ## SIREN MOB
 class Siren(Mob):
-    def __init__(self, name, health, atk_power, armor_class):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = ["mezmerize", "heal", "lull"]
-        self.inventory = ["bronze sword", "lesser heal potion"]
+        self.inventory = inventory
+        # self.inventory = ["bronze sword", "lesser heal potion"]
 
     ## MEZMERIZE ##
     def mezmerize(self, mob, is_crit):
@@ -550,10 +552,11 @@ You feel lulled and are stunned by her beauty and take {damage} damage!
 
 ## GOBLIN MOB
 class Goblin(Mob):
-    def __init__(self, name, health, atk_power, armor_class):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
         super().__init__(name, health, atk_power, armor_class)
         self.actions = ["claws", "kicks", "spits"]
-        self.inventory = ["rusty dagger", "lesser heal potion"]
+        self.inventory = inventory
+        # self.inventory = ["rusty dagger", "lesser heal potion"]
 
     def claws(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 6))
