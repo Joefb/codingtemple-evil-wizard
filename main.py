@@ -4,9 +4,9 @@ import classes
 
 
 class Game:
-    def __init__(self, player, mob):
+    def __init__(self, player):
         self.player = player
-        self.mob = mob
+        # self.mob = mob
 
     def display_status(self, player, mob):
         """Displays a status 'bar' for player and mob."""
@@ -14,7 +14,7 @@ class Game:
 {"=" * 40}
 | Player: {player.name:<10} 
 {"-" * 40}
-| HP: {player.health:>3} | ATK: {player.atk_power:>2} | AC: {player.armor_class:>} 
+| Class:{player.__class__.__name__} | HP: {player.health:>3} | ATK: {player.atk_power:>2} | AC: {player.armor_class:>} 
 {"-" * 40}
 | Weapon: {player.weapon_name:<20} 
 | Inventory: {", ".join(player.inventory) if player.inventory else "Empty":<30} 
@@ -87,8 +87,54 @@ class Game:
                 print("You have been defeated!")
                 return
 
-    def print_welcome(self):
-        print("Welcome to Evil Wizard!!")
+
+def main():
+    print("Welcome to Evil Wizard!!")
+    input("Press enter to continue...")
+    os.system("cls" if os.name == "nt" else "clear")
+    print("Create your character:")
+    print("Enter your name young adventurer: ")
+    name = input("-> ")
+    print("")
+    print("Choose your class:")
+    print("1) Warrior")
+    print("2) Druid")
+
+    while True:
+        try:
+            class_choice = int(input("-> "))
+            if class_choice < 1 or class_choice > 2:
+                print("Invalid input. Please enter a valid action number.")
+                continue
+
+            if class_choice == 1:
+                new_toon = classes.Warrior(name)
+                break
+            elif class_choice == 2:
+                new_toon = classes.Druid(name)
+                break
+
+        except ValueError:
+            print("Invalid input. Please enter a valid action number.")
+            continue
+
+    game = Game(new_toon)
+    new_mob = classes.Goblin("Goblin", 30, 3, 11)
+    game.battle(new_toon, new_mob)
+
+    # new_toon = classes.Warrior("Bob")
+    # new_toon = classes.Druid("Bob")
+    # new_mob = classes.Goblin("Goblin", 30, 3, 11)
+    # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
+    # new_mob = classes.Siren("Siren", 20, 5, 9, ["bronze sword", "lesser heal potion"])
+    # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+    # game = Game(new_toon, new_mob)
+    # game.battle(new_toon, new_mob)
+
+    # self.inventory = ["bronze sword", "lesser heal potion"]
+
+    # def print_welcome(self):
+    #     print("Welcome to Evil Wizard!!")
 
     def create_char(self):
         os.system("cls" if os.name == "nt" else "clear")
@@ -105,20 +151,6 @@ class Game:
             new_toon = classes.Warrior(name)
         elif class_choice == "2":
             new_toon = classes.Druid(name)
-
-
-def main():
-    # new_toon = classes.Warrior("Bob")
-    new_toon = classes.Druid("Bob")
-    # new_mob = classes.Goblin("Goblin", 30, 3, 11)
-    # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
-    new_mob = classes.Siren("Siren", 20, 5, 9, ["bronze sword", "lesser heal potion"])
-    # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
-    game = Game(new_toon, new_mob)
-    game.battle(new_toon, new_mob)
-    input("Press enter to continue...")
-
-    # self.inventory = ["bronze sword", "lesser heal potion"]
 
 
 if __name__ == "__main__":
