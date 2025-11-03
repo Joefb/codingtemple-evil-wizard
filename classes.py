@@ -1,5 +1,6 @@
 ## Game Classes and items
 import random
+import re
 
 
 ## ITEMS
@@ -14,12 +15,12 @@ class Items:
 
         self.weapons = {
             "fists": (1, 2, 0),
-            "rusty dagger": (1, 4, 0),
+            "rusty dagger": (1, 6, 0),
             "bronze sword": (3, 10, 1),
             "Mace of the Ancient Gods": (5, 15, 8),
-            "broken wand": (1, 2, 0),
-            "glowing wand": (3, 6, 3),
-            "Wand of Eternal Destruction": (6, 12, 10),
+            "broken staff": (1, 2, 0),
+            "glowing staff": (3, 6, 3),
+            "Staff of Eternal Destruction": (6, 12, 10),
         }
 
 
@@ -99,27 +100,30 @@ class Char(Items):
                     heal_amount = self.items.get(potion_name)
                     healed = self.heal_self(heal_amount)
                     self.health += healed
-                    print(
+                    self.inventory.remove(potion_name)
+                    return (
                         f"You drink the {potion_name} and heal for {healed} hitpoints!"
                     )
-                    self.inventory.remove(potion_name)
 
                 elif "mana" in potion_name:
                     mana_amount = self.items.get(potion_name)
                     manad = self.heal_self(mana_amount)
                     self.mana += manad
-                    print(f"You drink the {potion_name} and restore {manad} mana!")
                     self.inventory.remove(potion_name)
+                    return f"You drink the {potion_name} and restore {manad} mana!"
 
         except ValueError:
             print("Invalid number. Please enter a valid potion number.")
             self.drink_potion()
 
     def loot_mob(self, mob):
+        looted_items = ""
         if len(mob.inventory) > 0:
             for item in mob.inventory:
-                print(f"You loot a {item} from the {mob.name}!")
                 self.inventory.append(item)
+                looted_items += f"{item}, "
+
+            return f"You loot {looted_items}from the {mob.name}!"
 
     def equip_weapon(self):
         """
@@ -152,12 +156,14 @@ class Char(Items):
                 print(f"Damage: {self.weapon_damage[0]} - {self.weapon_damage[1]}")
                 print(f"Attack Power Bonus: {self.weapon_damage[2]}")
                 print(f"Hit Chance Bonus: {self.weapon_damage[2]}")
+                input("Press enter to continue...")
 
         except ValueError:
             print("Invalid number. Please enter a valid weapon number.")
             self.equip_weapon()
 
-    def do_action(self, mob_name, mob_ac, atk_power):
+    # def do_action(self, mob, mob_ac, atk_power):
+    def do_action(self, action, mob):
         """
         Iterates through the actions list and prints them out player. Actions list
         are function names in each class. getattr is used to call the function.
@@ -167,59 +173,31 @@ class Char(Items):
         # if stuned decrament stun duration and skip turn
         if self.stun_duration > 0:
             self.stun_duration -= 1
-            print("You are stunned and cannot act this turn!")
-            return
-
-        # used for numbering the actions
-        counter = 1
-        # list out actions
-        # preform input validation
-        while True:
-            try:
-                print("What will you do?")
-                print("Choose a action:")
-                for skill in self.actions:
-                    print(f"{counter}) {skill}")
-                    counter += 1
-
-                # gets player action
-                action = int(input("-> "))
-                if action < 1 or action > len(self.actions):
-                    counter = 1
-                    print("Invalid input. Please enter a action number.")
-                    continue
-
-            except ValueError:
-                counter = 1
-                print("Invalid input. Please enter a action number.")
-
-            else:
-                break
+            return "You are stunned and cannot act this turn!"
 
         # preform hit check
         if action == 1 or action == 2 or action == 3:
-            hit, is_crit = self.hit_check(mob_ac, atk_power)
+            hit, is_crit = self.hit_check(mob.armor_class, self.atk_power)
 
             if not hit:
-                print(f"You miss the {mob_name}!")
-                return False
+                return f"You miss the {mob.name}!"
 
         # gets the action from action list in the child class and calls the method
         # in the instance method
         if action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
         if action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
         if action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
         # drink potion
         if action == 4:
@@ -229,12 +207,11 @@ class Char(Items):
                 if item in self.items:
                     count_items.append(idx)
             if len(count_items) == 0:
-                print("You have no potions in your inventory!")
-                return
+                return "You have no potions in your inventory!"
 
             self.action = self.actions[3]
             self.action_method = getattr(self, self.action)
-            self.action_method()
+            return self.action_method()
 
         # equip weapon
         if action == 5:
@@ -244,12 +221,76 @@ class Char(Items):
                 if wep in self.weapons:
                     count_weapons.append(idx)
             if len(count_weapons) == 0:
-                print("You have no weapons in your inventory!")
-                return
+                return "You have no weapons in your inventory!"
 
             self.action = self.actions[4]
             self.action_method = getattr(self, self.action)
             self.action_method()
+
+
+## Player Classes
+class Druid(Char):
+    def __init__(self, name):
+        super().__init__(name, health=40, atk_power=20, armor_class=8)
+        # set starting weapon and get its damage from weapons dict in Items class
+        self.weapon_name = "fists"
+        self.weapon_damage = self.weapons.get(self.weapon_name)
+        # set the atk_power to include the weapon's atk_power bonus
+        self.atk_power += self.weapon_damage[2]
+        #  actions. Each action is a method in this class
+        self.actions = [
+            "strike",
+            "natures_touch",
+            "starfire",
+            "drink_potion",
+            "equip_weapon",
+        ]
+        # set bash damage and cooldown
+        self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
+        # inventory
+        self.inventory = ["fists"]
+
+    def strike(self, mob, is_crit):
+        # Rolls damage and sets attack message
+        damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+
+        # check for crit and apply damage
+        if is_crit:
+            damage += damage * 2
+            mob.health -= damage
+            return f"CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!"
+
+        mob.health -= damage
+        return f"You strike the {mob.name} for {damage} damage!"
+
+    def natures_touch(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+You land a CRITICAL STRIKE!
+You heal for {heal_amount} hitpoints!
+                   """
+        else:
+            self.health += heal_amount
+            return f"You heal for {heal_amount} hitpoints!"
+
+    def starfire(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+You land a CRITICAL STRIKE!
+You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!
+                   """
+
+        mob.health -= damage
+        return f"You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!"
 
 
 class Warrior(Char):
@@ -271,7 +312,7 @@ class Warrior(Char):
         # inventory
         self.inventory = ["fists"]
 
-    def strike(self, mob_name, is_crit):
+    def strike(self, mob, is_crit):
         # Rolls damage and sets attack message
         damage = self.attack_dmg(self.atk_power, self.weapon_damage)
 
@@ -280,251 +321,277 @@ class Warrior(Char):
             damage = damage + 10 * 2
             self.enrage_cooldown -= 1
 
-        elif self.enrage_cooldown == 7:
-            print("You are no longer Enraged!")
-            self.enrage_cooldown -= 1
-
         elif self.enrage_cooldown > 0:
             self.enrage_cooldown -= 1
 
         # check for crit and apply damage
         if is_crit:
-            damage = damage * 2
-            new_mob.health -= damage
-            print("You land a CRITICAL STRIKE!")
-        else:
-            new_mob.health -= damage
+            damage += damage * 2
+            mob.health -= damage
+            if self.enrage_cooldown == 7:
+                return f"""
+                            You are no longer Enraged!
+                            CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!
+                       """
+        elif is_crit and self.enrage_cooldown < 7:
+            mob.health -= damage
+            return f"CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!"
 
-        print(f"You strike the {mob_name} for {damage} damage!")
+        if self.enrage_cooldown == 7:
+            mob.health -= damage
+            return f"You are no longer Enraged!\nYou strike the {mob.name} for {damage} damage!"
 
-    def bash(self, mob_name, is_crit):
+        mob.health -= damage
+        return f"You strike the {mob.name} for {damage} damage!"
+
+    def bash(self, mob, is_crit):
         damage = self.attack_dmg(1, self.bash_damage)
-        attack_mesge = (
-            f"You bash the {mob_name} for {damage} damage!\nThe {mob_name} is stunned!"
-        )
         # check if is on bash cooldown
         if self.bash_cooldown > 0:
-            print(f"Bash is on cooldown for {self.bash_cooldown} more turns!")
             self.bash_cooldown -= 1
-            return
+            return f"Bash is on cooldown for {self.bash_cooldown} more turns!"
+
         # check for crit and apply damage and stun
         elif is_crit:
             damage = damage * 2
-            new_mob.health -= damage
-            new_mob.stun_duration = 2
+            mob.health -= damage
+            mob.stun_duration = 2
             self.bash_cooldown = 2
-            print("You land a CRITICAL STRIKE!")
-            print(attack_mesge)
+            return f"You land a CRITICAL STRIKE! You bash the {mob.name} for {damage} damage!\nThe {mob.name} is stunned!"
         else:
-            new_mob.stun_duration = 2
-            new_mob.health -= damage
+            mob.stun_duration = 2
+            mob.health -= damage
             self.bash_cooldown = 2
-            print(attack_mesge)
+            return f"You bash the {mob.name} for {damage} damage!\nThe {mob.name} is stunned!"
 
     # enrage is +10 to atk_power, hit chance, and always crits for 3 turns
     # 10 turn cooldown
-    def enrage(self, _mob_name, _is_crit):
+    def enrage(self, _mob, _is_crit):
         if self.enrage_cooldown > 0:
-            print(f"Enrage is on cooldown for {self.enrage_cooldown} more turns!")
             self.enrage_cooldown -= 1
+            return f"Enrage is on cooldown for {self.enrage_cooldown} more turns!"
         else:
             self.enrage_cooldown = 10
             self.health += 20
-            print("You ENRAGE!")
-            print("You heal 20 hitpoints!")
-            print("For 3 turns Strike has a +10 hit chance, damage, and always crits!")
+            return """
+You ENRAGE!
+You heal for 20 hitpoints!
+For 3 turns Strike has a +10 hit chance, damage, and always crits!
+                    """
 
 
 ## GOBILN MOB CLASS
 class Mob(Char):
-    def __init__(self, name):
-        super().__init__(name, health=25, atk_power=2, armor_class=10)
-        self.actions = ["claws", "kicks", "spits"]
-        self.inventory = ["lesser heal potion"]
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = []
 
-    def do_action(self, mob_name, mob_ac, atk_power):
+    def do_action(self, _unused_action, mob):
         """
         actions list are function names in each class.
         getattr is used to call the function.
         """
+        _ = _unused_action
         if self.stun_duration > 0:
             self.stun_duration -= 1
-            print(f"The {self.name} is stunned and cannot act this turn!")
-            return
+            return f"The {self.name} is stunned and cannot act this turn!"
 
         random_action = random.randint(1, 3)
 
         if random_action == 1 or random_action == 2 or random_action == 3:
-            hit, is_crit = self.hit_check(mob_ac, atk_power)
+            hit, is_crit = self.hit_check(mob.armor_class, self.atk_power)
 
             if not hit:
-                print(f"The {self.name} misses you!")
-                return False
+                return f"The {self.name} misses you!"
 
         if random_action == 1:
             self.action = self.actions[0]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
         if random_action == 2:
             self.action = self.actions[1]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
         if random_action == 3:
             self.action = self.actions[2]
             self.action_method = getattr(self, self.action)
-            self.action_method(mob_name, is_crit)
+            return self.action_method(mob, is_crit)
 
-    def claws(self, _, is_crit):
-        damage = self.attack_dmg(self.atk_power, (1, 4))
+
+class Wizard(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["fireball", "meteor", "brimstone"]
+        self.inventory = inventory
+
+    def fireball(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 8))
+
         if is_crit:
-            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers.
+                """
         else:
-            new_toon.health -= damage
+            mob.health -= damage
+            # return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+            return f"""
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers."
+"""
 
-        print(
-            f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
-        )
+    def meteor(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
 
-    def kicks(self, _, is_crit):
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+        else:
+            mob.health -= damage
+            return f"""
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+
+    def brimstone(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (4, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
+
+
+## SIREN MOB
+class Siren(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["mezmerize", "heal", "lull"]
+        self.inventory = inventory
+
+    ## MEZMERIZE ##
+    def mezmerize(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} mezmerizes you. You fall in love, loose control and stab yourself for {damage} of damage!
+                   """
+        else:
+            mob.health -= damage
+            return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+
+    ## HEAL ##
+    def heal(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to sing. You see their wounds heal!
+                   """
+        else:
+            self.health += heal_amount
+            return f"The {self.name} begins to sing. You see her wounds heal!"
+
+    def lull(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (1, 4))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+
+
+## GOBLIN MOB
+class Goblin(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["claws", "kicks", "spits"]
+        self.inventory = inventory
+        # self.inventory = ["rusty dagger", "lesser heal potion"]
+
+    def claws(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 6))
         if is_crit:
-            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} snarles at you and slashes you with their claws for {damage} of damage!
+                   """
         else:
-            new_toon.health -= damage
+            mob.health -= damage
+            return f"The {self.name} snarles at you and slashes you with their claws for {damage} of damage!"
 
-        print(
-            f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
-        )
+    def kicks(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (1, 6))
 
-    def spits(self, _, is_crit):
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!
+                    """
+        else:
+            mob.health -= damage
+            return f'"Smelly human die! No take my shiny!" the {self.name} screams as they kick you for {damage} damage!'
+
+    def spits(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 1))
         if is_crit:
-            print(f"The {self.name} lands a CRITICAL STRIKE!")
             damage = damage * 2
-            new_toon.health -= damage
-            new_toon.stun_duration = 1
+            mob.health -= damage
+            mob.stun_duration = 1
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!
+                    """
         else:
-            new_toon.health -= damage
-            new_toon.stun_duration = 1
-
-        print(
-            f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
-        )
+            mob.health -= damage
+            mob.stun_duration = 1
+            return f"The {self.name} spits in your eyes for {damage} damage as they smile and kackle! You can't see and are stunned!"
 
 
 #### TESTING AREA CODE #######
-# new_toon = Warrior("bob")
-# new_mob = Mob("goblin")
-
-# print(f"You encounter a {new_mob.name}!")
-##input("Press enter to continue...")
-# print("")
-
-# while new_toon.health > 0 and new_mob.health > 0:
-#     print("--------- Toon Status ---------")
-#     print(f"{new_toon.name} Health: {new_toon.health}")
-#     print(f"{new_mob.name} Health: {new_mob.health}")
-#     print(f"Attack Power: {new_toon.atk_power}")
-#     print(f"Armor Class: {new_toon.armor_class}")
-#     print(f"Weapon: {new_toon.weapon_name}")
-#     print(f"weapon Damage: {new_toon.weapon_damage}")
-#     print(f"Enrage Counter: {new_toon.enrage_cooldown}")
-#     print(f"Inventory: {new_toon.inventory}")
-#     print("---------------------------")
-#     print("")
-#     print("--------- Mob Status ---------")
-#     print(f"{new_mob.name} Health: {new_mob.health}")
-#     print(f"Attack Power: {new_mob.atk_power}")
-#     print(f"Armor Class: {new_mob.armor_class}")
-#     print(f"Weapon: {new_mob.weapon_name}")
-#     print(f"weapon Damage: {new_mob.weapon_damage}")
-#
-#     ## Attack and check if mob or player is stuned or dead
-#     new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-#     if new_mob.health <= 0:
-#         print(f"You have defeated the {new_mob.name}!")
-#         new_toon.loot_mob(new_mob)
-#         print(f"Inventory: {new_toon.inventory}")
-#         break
-# elif new_toon.stun_duration > 0:
-#     print("You are stunned and cannot act this turn!")
-#     new_toon.stun_duration -= 1
-# else:
-# print("What will you do?!")
-# new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-
-# new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-# if new_toon.health <= 0:
-#     print("You have been defeated!")
-#     break
-# elif new_mob.stun_duration > 0:
-#     print(f"The {new_mob.name} is stunned and cannot act this turn!")
-#     new_mob.stun_duration -= 1
-# else:
-#     new_mob.do_action(new_toon.name, new_toon.armor_class, new_mob.atk_power)
-
-
-# EQUIP WEAPON EXAMPLE
-# if item in self.weapons:
-#     print(f"You equip the {item}!")
-#     self.weapon_name = item
-#     self.weapon_damage = self.weapons.get(item)
-
-
-# new_toon.do_action(new_mob.name, new_mob.armor_class, new_toon.atk_power)
-# print(
-#     f"new_toon: {new_toon.name}, {new_toon.health}, {new_toon.atk_power}, {new_toon.armor_class}"
-# )
-# print(f"{new_toon.weapon_damage}")
-# print(type(new_toon.weapon_damage))
-# print(new_mob.armor_class)
-# print(new_toon.armor_class)
-## INVENTORY EXAMPLES
-# new_toon.item_key = "lesser heal potion"
-# print(f"{new_toon.name} has found a {new_toon.items.get(new_toon.item_key)}")
-# new_toon.inventory[new_toon.item_key] = new_toon.items.get(new_toon.item_key)
-# print(f"inventory {new_toon.inventory}")
-# new_toon.do_action()
-
-
-# new_toon.inventory(new_toon.items.get("lesser heal potion"))
-# print(f"{new_toon.name} has found a {new_toon.items.get(item_key)}")
-# new_toon.inventory["lesser heal potion"] = new_toon.items.get("lesser heal potion")
-# print(f"item: {new_toon.items}")
-
-# print(new_toon.test())
-# new_toon = Warrior("bob", 100, 3, 15)
-# print(new_toon.attack_dmg(3, (1, 5)))
-# print(new_toon.hit_check(10, new_toon.atk_power))
-#
-# def do_action(self, mob_name, mob_ac, atk_power):
-#     counter = 1
-#
-#     print("Choose a action:")
-#     for skill in self.actions:
-#         print(f"{counter}) {skill}")
-#         counter += 1
-#
-#     action = int(input("-> "))
-#     if action == 1 or action == 2:
-#         hit, is_crit = self.hit_check(mob_ac, atk_power)
-#
-#         if not hit:
-#             # return f"You miss the {mob_name}!"
-#             print(f"You miss the {mob_name}!")
-#             return False
-#
-#     if action == 1:
-#         self.strike(mob_name, is_crit)
-#
-#     if action == 2:
-#         pass
-#
-#     if action == 3:
-#         pass
