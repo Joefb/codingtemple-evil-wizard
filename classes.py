@@ -15,12 +15,12 @@ class Items:
 
         self.weapons = {
             "fists": (1, 2, 0),
-            "rusty dagger": (1, 4, 0),
+            "rusty dagger": (1, 6, 0),
             "bronze sword": (3, 10, 1),
             "Mace of the Ancient Gods": (5, 15, 8),
-            "broken wand": (1, 2, 0),
-            "glowing wand": (3, 6, 3),
-            "Wand of Eternal Destruction": (6, 12, 10),
+            "broken staff": (1, 2, 0),
+            "glowing staff": (3, 6, 3),
+            "Staff of Eternal Destruction": (6, 12, 10),
         }
 
 
@@ -100,27 +100,30 @@ class Char(Items):
                     heal_amount = self.items.get(potion_name)
                     healed = self.heal_self(heal_amount)
                     self.health += healed
-                    print(
+                    self.inventory.remove(potion_name)
+                    return (
                         f"You drink the {potion_name} and heal for {healed} hitpoints!"
                     )
-                    self.inventory.remove(potion_name)
 
                 elif "mana" in potion_name:
                     mana_amount = self.items.get(potion_name)
                     manad = self.heal_self(mana_amount)
                     self.mana += manad
-                    print(f"You drink the {potion_name} and restore {manad} mana!")
                     self.inventory.remove(potion_name)
+                    return f"You drink the {potion_name} and restore {manad} mana!"
 
         except ValueError:
             print("Invalid number. Please enter a valid potion number.")
             self.drink_potion()
 
     def loot_mob(self, mob):
+        looted_items = ""
         if len(mob.inventory) > 0:
             for item in mob.inventory:
                 self.inventory.append(item)
-                return f"You loot a {item} from the {mob.name}!"
+                looted_items += f"{item}, "
+
+            return f"You loot {looted_items}from the {mob.name}!"
 
     def equip_weapon(self):
         """
@@ -153,6 +156,7 @@ class Char(Items):
                 print(f"Damage: {self.weapon_damage[0]} - {self.weapon_damage[1]}")
                 print(f"Attack Power Bonus: {self.weapon_damage[2]}")
                 print(f"Hit Chance Bonus: {self.weapon_damage[2]}")
+                input("Press enter to continue...")
 
         except ValueError:
             print("Invalid number. Please enter a valid weapon number.")
@@ -207,7 +211,7 @@ class Char(Items):
 
             self.action = self.actions[3]
             self.action_method = getattr(self, self.action)
-            self.action_method()
+            return self.action_method()
 
         # equip weapon
         if action == 5:
@@ -222,6 +226,71 @@ class Char(Items):
             self.action = self.actions[4]
             self.action_method = getattr(self, self.action)
             self.action_method()
+
+
+## Player Classes
+class Druid(Char):
+    def __init__(self, name):
+        super().__init__(name, health=40, atk_power=20, armor_class=8)
+        # set starting weapon and get its damage from weapons dict in Items class
+        self.weapon_name = "fists"
+        self.weapon_damage = self.weapons.get(self.weapon_name)
+        # set the atk_power to include the weapon's atk_power bonus
+        self.atk_power += self.weapon_damage[2]
+        #  actions. Each action is a method in this class
+        self.actions = [
+            "strike",
+            "natures_touch",
+            "starfire",
+            "drink_potion",
+            "equip_weapon",
+        ]
+        # set bash damage and cooldown
+        self.bash_damage = (1, 2, 0)  # (min, max, atk_power)
+        # inventory
+        self.inventory = ["fists"]
+
+    def strike(self, mob, is_crit):
+        # Rolls damage and sets attack message
+        damage = self.attack_dmg(self.atk_power, self.weapon_damage)
+
+        # check for crit and apply damage
+        if is_crit:
+            damage += damage * 2
+            mob.health -= damage
+            return f"CRITICAL STRIKE! You strike the {mob.name} for {damage} damage!"
+
+        mob.health -= damage
+        return f"You strike the {mob.name} for {damage} damage!"
+
+    def natures_touch(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+You land a CRITICAL STRIKE!
+You heal for {heal_amount} hitpoints!
+                   """
+        else:
+            self.health += heal_amount
+            return f"You heal for {heal_amount} hitpoints!"
+
+    def starfire(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+You land a CRITICAL STRIKE!
+You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!
+                   """
+
+        mob.health -= damage
+        return f"You hurl starfire at the {mob.name}! The {mob.name}'s skin ignites for {damage} of damage!"
 
 
 class Warrior(Char):
@@ -317,10 +386,10 @@ For 3 turns Strike has a +10 hit chance, damage, and always crits!
 
 ## GOBILN MOB CLASS
 class Mob(Char):
-    def __init__(self, name):
-        super().__init__(name, health=25, atk_power=2, armor_class=10)
-        self.actions = ["claws", "kicks", "spits"]
-        self.inventory = ["lesser heal potion"]
+    def __init__(self, name, health, atk_power, armor_class):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = []
+        # self.inventory = inventory
 
     def do_action(self, _unused_action, mob):
         """
@@ -355,8 +424,142 @@ class Mob(Char):
             self.action_method = getattr(self, self.action)
             return self.action_method(mob, is_crit)
 
-    def claws(self, mob, is_crit):
+
+class Wizard(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["fireball", "meteor", "brimstone"]
+        self.inventory = inventory
+        # self.inventory = ["scroll of escape"]
+
+    def fireball(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 8))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers.
+                """
+        else:
+            mob.health -= damage
+            # return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+            return f"""
+The {self.name} hurls a fireball at you for {damage} of damage!
+'Pathetic fool. Your foolish attempts amuse me. Weak...' the {self.name} sneers."
+"""
+
+    def meteor(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (3, 18))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+        else:
+            mob.health -= damage
+            return f"""
+The {self.name} summons a meteor that crashes down on you for {damage} of damage!
+'Submit to my power or die you rat!' the {self.name} shouts.
+"""
+
+    def brimstone(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (4, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to whisper a spell. Molten brimstone swirls around you.
+The molten brimstone burns you for {damage} damage and you are stunned by the heat!
+            """
+
+
+## SIREN MOB
+class Siren(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["mezmerize", "heal", "lull"]
+        self.inventory = inventory
+        # self.inventory = ["bronze sword", "lesser heal potion"]
+
+    ## MEZMERIZE ##
+    def mezmerize(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (2, 12))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} mezmerizes you. You fall in love, loose control and stab yourself for {damage} of damage!
+                   """
+        else:
+            mob.health -= damage
+            return f"The {self.name} mezmerizes you. You loose control and stab yourself for {damage} of damage!"
+
+    ## HEAL ##
+    def heal(self, _unused_mob, is_crit):
+        heal_amount = self.heal_self((10, 20))
+        _ = _unused_mob
+
+        if is_crit:
+            heal_amount = heal_amount * 2
+            self.health += heal_amount
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to sing. You see their wounds heal!
+                   """
+        else:
+            self.health += heal_amount
+            return f"The {self.name} begins to sing. You see her wounds heal!"
+
+    def lull(self, mob, is_crit):
         damage = self.attack_dmg(self.atk_power, (1, 4))
+
+        if is_crit:
+            damage = damage * 2
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} lands a CRITICAL STRIKE!
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+        else:
+            mob.health -= damage
+            mob.stun_duration = 2
+            return f"""
+The {self.name} begins to dance and seduces you. 
+You feel lulled and are stunned by her beauty and take {damage} damage!
+            """
+
+
+## GOBLIN MOB
+class Goblin(Mob):
+    def __init__(self, name, health, atk_power, armor_class, inventory=[]):
+        super().__init__(name, health, atk_power, armor_class)
+        self.actions = ["claws", "kicks", "spits"]
+        self.inventory = inventory
+        # self.inventory = ["rusty dagger", "lesser heal potion"]
+
+    def claws(self, mob, is_crit):
+        damage = self.attack_dmg(self.atk_power, (1, 6))
         if is_crit:
             damage = damage * 2
             mob.health -= damage

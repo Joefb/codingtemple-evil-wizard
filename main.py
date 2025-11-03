@@ -87,13 +87,56 @@ class Game:
                 print("You have been defeated!")
                 return
 
+    def print_welcome(self):
+        print("Welcome to Evil Wizard!!")
+
+    def create_char(self):
+        os.system("cls" if os.name == "nt" else "clear")
+        print("Create your character:")
+        print("Enter your name young adventurer: ")
+        name = input("-> ")
+        print("")
+        print("Choose your class:")
+        print("1) Warrior")
+        print("2) Druid")
+        class_choice = input("-> ")
+
+        if class_choice == "1":
+            new_toon = classes.Warrior(name)
+        elif class_choice == "2":
+            new_toon = classes.Druid(name)
+
+
+def main():
+    # new_toon = classes.Warrior("Bob")
+    new_toon = classes.Druid("Bob")
+    # new_mob = classes.Goblin("Goblin", 30, 3, 11)
+    # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
+    new_mob = classes.Siren("Siren", 20, 5, 9, ["bronze sword", "lesser heal potion"])
+    # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+    game = Game(new_toon, new_mob)
+    game.battle(new_toon, new_mob)
+    input("Press enter to continue...")
+
+    # self.inventory = ["bronze sword", "lesser heal potion"]
+
+
+if __name__ == "__main__":
+    main()
 
 #### TESTING AREA CODE #######
-new_toon = classes.Warrior("Bob")
-new_mob = classes.Mob("Goblin")
-game = Game(new_toon, new_mob)
-game.battle(new_toon, new_mob)
-
+# new_toon = classes.Warrior("Bob")
+# new_mob = classes.Goblin("Goblin", 30, 3, 11)
+# new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
+# new_mob = classes.Siren("Siren", 30, 5, 12)
+# new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+# game = Game(new_toon, new_mob)
+# game.battle(new_toon, new_mob)
+# input("Press enter to continue...")
+# new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+# new_mob = classes.Goblin("Goblin", 30, 3, 11)
+# new_mob = classes.Siren("Enraged Siren", 30, 5, 12)
+# game.battle(new_toon, new_mob)
 # new_toon = classes.Warrior("bob")
 # new_mob = classes.Mob("goblin")
 # game = Game(new_toon, new_mob)
