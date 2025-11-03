@@ -87,16 +87,49 @@ class Game:
                 print("You have been defeated!")
                 return
 
+    def print_welcome(self):
+        print("Welcome to Evil Wizard!!")
+
+    def create_char(self):
+        os.system("cls" if os.name == "nt" else "clear")
+        print("Create your character:")
+        print("Enter your name young adventurer: ")
+        name = input("-> ")
+        print("")
+        print("Choose your class:")
+        print("1) Warrior")
+        print("2) Wizard")
+        class_choice = input("-> ")
+
+        if class_choice == "1":
+            new_char = classes.Warrior(name)
+        elif class_choice == "2":
+            new_char = classes.Wizard(name)
+
+
+def main():
+    new_toon = classes.Warrior("Bob")
+    # new_mob = classes.Goblin("Goblin", 30, 3, 11)
+    # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
+    new_mob = classes.Siren("Siren", 30, 5, 12)
+    # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+    game = Game(new_toon, new_mob)
+    game.battle(new_toon, new_mob)
+    input("Press enter to continue...")
+
+
+if __name__ == "__main__":
+    main()
 
 #### TESTING AREA CODE #######
-new_toon = classes.Warrior("Bob")
+# new_toon = classes.Warrior("Bob")
 # new_mob = classes.Goblin("Goblin", 30, 3, 11)
 # new_mob = classes.Goblin("Scrawny Goblin", 15, 3, 8)
 # new_mob = classes.Siren("Siren", 30, 5, 12)
-new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
-game = Game(new_toon, new_mob)
-game.battle(new_toon, new_mob)
-input("Press enter to continue...")
+# new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
+# game = Game(new_toon, new_mob)
+# game.battle(new_toon, new_mob)
+# input("Press enter to continue...")
 # new_mob = classes.Wizard("The Evil Wizard", 50, 5, 13)
 # new_mob = classes.Goblin("Goblin", 30, 3, 11)
 # new_mob = classes.Siren("Enraged Siren", 30, 5, 12)
